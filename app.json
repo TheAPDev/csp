@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "WONDERKIN",
+    "slug": "wonderkin",
+    "scheme": "wonderkin",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "icon": "./src/assets/images/icon-placeholder.png",
+    "splash": {
+      "backgroundColor": "#0B1026"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.wonderkin.app"
+    },
+    "android": {
+      "package": "com.wonderkin.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0B1026"
+      }
+    },
+    "plugins": ["expo-router", "expo-camera", "expo-av"],
+    "extra": {
+      "eas": {}
+    }
+  }
+}
