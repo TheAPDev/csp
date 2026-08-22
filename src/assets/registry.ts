@@ -38,10 +38,25 @@ export type AssetId =
   // First-time onboarding (Batch 02)
   | "ONBOARDING_WELCOME_BACKGROUND"
   | "ONBOARDING_STORY_BACKGROUND"
+  // Grove environmental evolution stages (Batch 03) — background varies
+  // with progression; business logic never hardcodes which stage looks
+  // like what, it only picks the AssetId via groveStore.
+  | "GROVE_BACKGROUND_BLOOM"
+  | "GROVE_BACKGROUND_RADIANT"
+  // Grove living-environment layer (Batch 03)
+  | "GROVE_COMPANION_PLATFORM"
+  // World gateway portals, rendered from inside the Grove (Batch 03)
+  | "GATEWAY_MISSIONS"
+  | "GATEWAY_TALE_TRAILS"
+  | "GATEWAY_TREASURE_HUNT"
+  | "GATEWAY_THE_BEYOND"
   // Icons (semantic, not literal)
   | "ICON_XP"
   | "ICON_CURRENCY_PRIMARY"
   | "ICON_CURRENCY_PREMIUM"
+  | "ICON_ADVENTURE_TICKET"
+  | "ICON_COLLECTOR_TOKEN"
+  | "ICON_NOTIFICATION"
   | "ICON_MISSION"
   | "ICON_STORY"
   | "ICON_TREASURE"
@@ -77,9 +92,21 @@ export const assetRegistry: Record<AssetId, AssetEntry> = {
   ONBOARDING_WELCOME_BACKGROUND: { kind: "image", source: null },
   ONBOARDING_STORY_BACKGROUND: { kind: "image", source: null },
 
+  GROVE_BACKGROUND_BLOOM: { kind: "image", source: null },
+  GROVE_BACKGROUND_RADIANT: { kind: "image", source: null },
+  GROVE_COMPANION_PLATFORM: { kind: "image", source: null },
+
+  GATEWAY_MISSIONS: { kind: "image", source: null },
+  GATEWAY_TALE_TRAILS: { kind: "image", source: null },
+  GATEWAY_TREASURE_HUNT: { kind: "image", source: null },
+  GATEWAY_THE_BEYOND: { kind: "image", source: null },
+
   ICON_XP: { kind: "image", source: null },
   ICON_CURRENCY_PRIMARY: { kind: "image", source: null },
   ICON_CURRENCY_PREMIUM: { kind: "image", source: null },
+  ICON_ADVENTURE_TICKET: { kind: "image", source: null },
+  ICON_COLLECTOR_TOKEN: { kind: "image", source: null },
+  ICON_NOTIFICATION: { kind: "image", source: null },
   ICON_MISSION: { kind: "image", source: null },
   ICON_STORY: { kind: "image", source: null },
   ICON_TREASURE: { kind: "image", source: null },

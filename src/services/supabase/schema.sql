@@ -40,8 +40,17 @@ create table if not exists currencies (
   profile_id uuid primary key references profiles(id) on delete cascade,
   primary_currency int not null default 0,
   premium_currency int not null default 0,
+  -- Batch 03: additive columns for The Grove's status system. Existing
+  -- columns above are unchanged, per WONDERKIN_CONTINUITY §11.
+  adventure_tickets int not null default 1,
+  collector_tokens int not null default 0,
   updated_at timestamptz not null default now()
 );
+
+-- Ensure the columns exist even when applying this file against an
+-- already-provisioned Batch 01/02 database (idempotent upgrade path).
+alter table currencies add column if not exists adventure_tickets int not null default 1;
+alter table currencies add column if not exists collector_tokens int not null default 0;
 
 -- Mission progress (foundation row per profile; per-mission detail rows come in a later batch)
 create table if not exists mission_progress (
@@ -72,6 +81,32 @@ create table if not exists inventory_items (
   acquired_at timestamptz not null default now()
 );
 
+-- ============================================================
+-- Batch 03 — The Grove
+-- ============================================================
+
+-- Grove environmental state (evolution stage + last visit). The
+-- evolution stage itself is derived client-side from `progression`
+-- (see src/state/groveStore.ts); this table just persists it so a
+-- returning session on a new device shows the same bloomed Grove.
+create table if not exists grove_state (
+  profile_id uuid primary key references profiles(id) on delete cascade,
+  evolution_stage int not null default 0 check (evolution_stage in (0, 1, 2)),
+  last_visited_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- Notifications — the "Notifications" status surface. Read via the
+-- Grove's single unobtrusive StatusHub, never a dashboard list.
+create table if not exists notifications (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid references profiles(id) on delete cascade,
+  kind text not null check (kind in ('companion', 'adventure', 'reward', 'system')),
+  message text not null,
+  read boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
 -- Row Level Security — every table restricted to its own profile owner
 alter table profiles enable row level security;
 alter table companion_state enable row level security;
@@ -80,6 +115,8 @@ alter table currencies enable row level security;
 alter table mission_progress enable row level security;
 alter table story_progress enable row level security;
 alter table inventory_items enable row level security;
+alter table grove_state enable row level security;
+alter table notifications enable row level security;
 
 create policy "Own profile" on profiles for all using (auth.uid() = id);
 create policy "Own companion state" on companion_state for all using (auth.uid() = profile_id);
@@ -88,3 +125,5 @@ create policy "Own currencies" on currencies for all using (auth.uid() = profile
 create policy "Own mission progress" on mission_progress for all using (auth.uid() = profile_id);
 create policy "Own story progress" on story_progress for all using (auth.uid() = profile_id);
 create policy "Own inventory" on inventory_items for all using (auth.uid() = profile_id);
+create policy "Own grove state" on grove_state for all using (auth.uid() = profile_id);
+create policy "Own notifications" on notifications for all using (auth.uid() = profile_id);
