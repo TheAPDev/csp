@@ -30,6 +30,9 @@ export interface Currencies {
   profile_id: string;
   primary_currency: number;
   premium_currency: number;
+  /** Batch 03 — additive fields, do not restructure existing ones (see §11). */
+  adventure_tickets: number;
+  collector_tokens: number;
   updated_at: string;
 }
 
@@ -74,4 +77,31 @@ export interface CompanionTraits {
   curiosity: number;
   voice: number;
   bond: number;
+}
+
+/** WONDERKIN Shared Types — Batch 03 (The Grove) */
+
+/**
+ * How far the Grove environment has bloomed. Derived from progression
+ * (see `groveStore.evolutionStage`), never chosen ad-hoc by a screen.
+ * Stage only ever increases — the Grove never regresses visually.
+ */
+export type GroveEvolutionStage = 0 | 1 | 2;
+
+export interface GroveState {
+  profile_id: string;
+  evolution_stage: GroveEvolutionStage;
+  last_visited_at: string;
+  updated_at: string;
+}
+
+export type NotificationKind = "companion" | "adventure" | "reward" | "system";
+
+export interface NotificationItem {
+  id: string;
+  profile_id: string;
+  kind: NotificationKind;
+  message: string;
+  read: boolean;
+  created_at: string;
 }

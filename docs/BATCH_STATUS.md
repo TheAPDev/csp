@@ -178,3 +178,121 @@ the repository.
   now that onboarding hands off into it.
 - Consider having Grove's Companion reaction read `companionStore`
   traits for the first time (still never surfaced as numbers).
+
+---
+
+## Batch 03 — The Grove & World Gateway System
+
+**Status: BUILT LOCALLY. Tested. Awaiting explicit "YES, PUSH" approval.**
+
+### What was built
+
+- **The Grove rebuilt as the real emotional home**
+  (`src/worlds/worlds/Grove.tsx`): Companion center stage (tappable —
+  cycles mood, nudges the `bond` trait quietly, shows a short
+  Dialogue line), a living environment via the new `GroveAmbient`
+  looping-particle layer, `TodaysAdventureCard` as the screen's single
+  obvious primary action, `StatusHub` as the one unobtrusive status
+  surface, and `WorldGateway` portals to the other four Worlds. This
+  is explicitly NOT a dashboard — no XP/Level/Coin rows on the main
+  canvas, per the Product Bible.
+- **World-switching architecture** — the five main Worlds are no
+  longer switched via a tab bar:
+  - `components/WorldGateway.tsx` — spatial portal navigation,
+    reusing the existing `NavDestination` contract
+    (`GatewayDestination extends NavDestination`) rather than
+    inventing a new nav data shape.
+  - `components/ReturnToGrove.tsx` — the single consistent "way home"
+    every non-Grove World now renders.
+  - `components/WorldTransition.tsx` extended with a `variant` prop
+    (`fade | portal | fold | path | dissolve`), defaulting to `fade`
+    for backward compatibility with the Batch 02 onboarding hand-off.
+  - `navigation/transitionVariant.ts` — single source of truth mapping
+    each Grove<->World route to its transition variant (e.g.
+    Grove→Missions = portal, Missions→Grove = fold, Grove→Tale Trails
+    = path, Grove→Treasure Hunt = dissolve, Grove→The Beyond =
+    portal).
+  - `navigation/RootNavigator.tsx` rewritten to drive gateway-based
+    navigation and swap the active World at the transition's
+    midpoint, matching the existing swap-mid-fade pattern.
+  - `BottomNav` is no longer used for the five main Worlds but remains
+    in the component library for future conventional-tab-bar UI
+    (e.g. Parent Space).
+- **Status architecture (present but unobtrusive)**:
+  `state/progressionStore.ts` — local-first XP, level (derived via a
+  simple `floor(xp/100)+1` curve), coins, adventure tickets, collector
+  tokens, and notifications (stored as full objects; the Grove only
+  ever shows an unread dot, never a count/list on its main canvas).
+  Surfaced only through `StatusHub`'s pill + Sheet.
+- **Grove environmental evolution (prepared, not fully art-driven)**:
+  `state/groveStore.ts` derives an evolution stage (0/1/2) purely from
+  `progressionStore.level` via `evolutionStageForLevel` /
+  `groveBackgroundForStage`, mapped to two new placeholder background
+  `AssetId`s (`GROVE_BACKGROUND_BLOOM`, `GROVE_BACKGROUND_RADIANT`).
+  The stage is never stored independently, so it can't desync from
+  progression.
+- **Supabase**: new `grove_state` and `notifications` tables (both
+  RLS-scoped to `auth.uid()`); `currencies` gained additive
+  `adventure_tickets` / `collector_tokens` columns via
+  `alter table ... add column if not exists` (safe to re-run against
+  an existing Batch 01/02 database). New typed data-access files
+  `services/supabase/grove.ts` and `services/supabase/notifications.ts`;
+  `services/supabase/progress.ts` gained a generic `addCurrency`
+  helper covering all four currency-like fields.
+- 9 new `AssetId`s registered (2 Grove background stages, 1 companion
+  platform, 4 gateway portals, 2 status icons + notification icon —
+  all resolving to the existing themed placeholder until real art is
+  supplied, per the Asset Replacement Rule).
+- `CompanionReaction` gained an optional `onPress` (additive, existing
+  callers unaffected) so the Grove can make the Companion directly
+  interactive.
+
+### Testing performed
+
+- `npm install` — succeeded, 1254 packages, no errors.
+- `npx tsc --noEmit` — **0 errors**.
+- `npx expo export --platform android` — **full Metro bundle
+  succeeded**: 1265 modules compiled into a working Hermes bytecode
+  bundle with no build errors (up from 1255 in Batch 02).
+- `npx expo-doctor` — 14/17 checks passed; the same 3 failures as
+  Batch 01/02 (blocked network calls to Expo's remote registry in
+  this sandbox — not a project defect).
+- Manually traced: Companion tap → mood cycles, Dialogue line appears
+  and auto-dismisses, `bond` trait nudges without ever rendering as a
+  number. Grove→Missions→Grove and Grove→other-Worlds→Grove round
+  trips via `RootNavigator.navigateToWorld`, confirming the correct
+  variant is selected per route and the active World swaps at the
+  transition midpoint, not at the end. `StatusHub` Sheet renders all
+  six status values with no numeric content leaking onto the Grove's
+  main canvas.
+- Build artifacts (`dist/`, `.expo/`) removed before commit.
+
+### Explicitly deferred (per master protocol DO NOT list + Batch 03 instructions)
+
+- Real gameplay inside Missions, Tale Trails, Treasure Hunt, or The
+  Beyond — still placeholders, now reachable via gateway + returnable
+  via `ReturnToGrove`.
+- Parent Space, Store, AR, any second visual theme — unchanged.
+- Supabase syncing of the new progression/Grove/notification state
+  (local-first via Zustand `persist`; typed data-access functions
+  exist for a future sync batch).
+- Real illustrated art for the Grove's ambient layer or gateway
+  portals — `GroveAmbient` is procedural, portal art resolves to the
+  themed placeholder.
+- A literal radial/orbit geometry for `WorldGateway` — ships as a
+  wrapped arrangement of portals satisfying "not a tab bar, not an
+  arbitrary slide"; true radial/orbit layout can reuse the same
+  `GatewayDestination[]` data later without a contract change.
+
+### Push status
+
+**NOT pushed yet at time of writing this section** — per the approval
+gate, awaiting the user's explicit "YES, PUSH" before any commit/push.
+
+### Next batch (Batch 04) should
+
+- Read this file and `WONDERKIN_CONTINUITY.md` first.
+- Pick which World gets its first real gameplay pass (Missions is the
+  natural next step, since Today's Adventure already points at it).
+- Consider wiring `StatusHub`'s notification unread-dot to real
+  Companion/adventure events rather than manual test pushes.

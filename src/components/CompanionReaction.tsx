@@ -1,5 +1,6 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Pressable } from "react-native";
+import * as Haptics from "expo-haptics";
 import { AssetImage } from "./AssetImage";
 import { AssetId } from "@assets/registry";
 import { shadows, radius } from "@theme";
@@ -17,6 +18,12 @@ const moodToAsset: Record<CompanionMood, AssetId> = {
 interface CompanionReactionProps {
   mood: CompanionMood;
   size?: number;
+  /**
+   * Optional tap handler — added in Batch 03 so the Grove can make the
+   * Companion directly interactive (its center-stage role). Optional
+   * and additive: existing callers with no `onPress` are unaffected.
+   */
+  onPress?: () => void;
 }
 
 /**
@@ -24,11 +31,26 @@ interface CompanionReactionProps {
  * spine of the product — future batches will attach animation and
  * contextual teaching moments here without changing this contract.
  */
-export function CompanionReaction({ mood, size = 96 }: CompanionReactionProps) {
-  return (
+export function CompanionReaction({ mood, size = 96, onPress }: CompanionReactionProps) {
+  const content = (
     <View style={[styles.wrap, shadows.glow, { width: size, height: size, borderRadius: radius.pill }]}>
       <AssetImage id={moodToAsset[mood]} style={{ width: size, height: size, borderRadius: radius.pill }} />
     </View>
+  );
+
+  if (!onPress) return content;
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel="Your Companion"
+      onPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        onPress();
+      }}
+    >
+      {content}
+    </Pressable>
   );
 }
 

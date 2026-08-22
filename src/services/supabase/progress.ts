@@ -26,3 +26,21 @@ export async function getCurrencies(profileId: string): Promise<Currencies | nul
   if (error) return null;
   return data as Currencies;
 }
+
+/**
+ * Generic currency-field increment, added in Batch 03 so
+ * `adventure_tickets` / `collector_tokens` share one code path with
+ * the existing coin fields rather than four near-duplicate functions.
+ */
+export async function addCurrency(
+  profileId: string,
+  field: "primary_currency" | "premium_currency" | "adventure_tickets" | "collector_tokens",
+  amount: number
+) {
+  const current = await getCurrencies(profileId);
+  const nextValue = Math.max(0, (current?.[field] ?? 0) + amount);
+  return supabase
+    .from("currencies")
+    .update({ [field]: nextValue, updated_at: new Date().toISOString() })
+    .eq("profile_id", profileId);
+}

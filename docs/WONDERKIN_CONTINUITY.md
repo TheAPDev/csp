@@ -83,7 +83,9 @@ Single import surface: `src/components/index.ts`. Current inventory:
 `WonderkinModal` (exported from `Modal.tsx`), `Dialogue`,
 `CompanionReaction`, `ProgressBar`, `RewardBadge`, `StatusControl`,
 `Toast`, `LoadingIndicator`, `ErrorState`, `EmptyState`, `BottomNav`,
-`WorldTransition`, `AssetImage`.
+`WorldTransition`, `AssetImage`, `StatusHub`, `GroveAmbient`,
+`WorldGateway`, `TodaysAdventureCard`, `ReturnToGrove` (last five
+added Batch 03 — see §17).
 
 **Rule**: before adding a new component, check this list. If an
 existing component covers the need (even with new props), extend it
@@ -208,6 +210,18 @@ Store) will extend in later batches, not a finished nav system.
   existing ones without checking `NO_BACK_STEPS` and `app/index.tsx`.
 - The rule that Companion traits (`CompanionTraits`) are never
   rendered as a visible number/score.
+- The Grove's single-status-surface rule — `StatusHub` is the only
+  place XP/Level/Coins/Adventure Tickets/Collector Tokens/
+  Notifications render; don't add a second status readout to the
+  Grove's main canvas (Batch 03).
+- `WorldGateway`/`ReturnToGrove` as the only world-switching mechanism
+  for the five main Worlds — do not reintroduce a tab bar for them
+  (Batch 03).
+- The `GatewayDestination extends NavDestination` contract and the
+  `transitionVariantFor(from, to)` single-source-of-truth mapping for
+  transition variants (Batch 03).
+- `groveStore`'s evolution stage being *derived* from
+  `progressionStore.level`, never stored/set independently (Batch 03).
 
 If a later batch believes one of these must change, **stop and ask
 the user** rather than redesigning silently, per the master protocol's
@@ -297,3 +311,85 @@ Per the master protocol and to stay in scope for this batch only:
   responsibility").
 - Any second visual theme, Parent Space, full Missions/Stories/AR/
   Store — unchanged from Batch 01's deferral list.
+
+## 17. The Grove & World Gateway System — Batch 03
+
+The Grove is now the real hub Batch 01/02 deferred to. Its structure
+is deliberately NOT a dashboard — the Product Bible replaces
+XP/Level/Currency rows with a Companion-centered scene plus one
+unobtrusive status surface.
+
+- `worlds/worlds/Grove.tsx` — Companion center stage (`CompanionReaction`
+  is now tappable, cycles mood + nudges the `bond` trait quietly),
+  `GroveAmbient` (looping decorative motes, no interaction required),
+  `TodaysAdventureCard` (the screen's one primary action), `StatusHub`
+  (the one status surface), and `WorldGateway` (portals to the other
+  four Worlds).
+- **`components/StatusHub.tsx`** — the single unobtrusive status access
+  pattern. A small level-badge pill with a quiet unread dot; expands
+  into a `Sheet` showing XP/Coins/Adventure Tickets/Collector
+  Tokens/Notifications. This is the ONLY place those values render —
+  never on the Grove's main canvas. Do not add a second status
+  surface; extend this Sheet's contents instead.
+- **`components/WorldGateway.tsx`** — spatial world-switching nav.
+  Consumes `GatewayDestination extends NavDestination` (same contract
+  as `BottomNav`, per §4 — no parallel nav data shape), rendered as
+  portal artwork + label + one-line hint, NOT a tab bar. **`BottomNav`
+  is no longer used to switch between the five main Worlds** — it
+  remains available in the component library for other future UI
+  (e.g. Parent Space) that genuinely needs a conventional tab bar.
+- **`components/ReturnToGrove.tsx`** — the single consistent "way
+  home" affordance every non-Grove World renders now that a tab bar
+  no longer does this job. Do not invent a per-World variant.
+- **`components/WorldTransition.tsx`** now takes an optional `variant:
+  "fade" | "portal" | "fold" | "path" | "dissolve"` (defaults to
+  `"fade"` for backward compatibility with the onboarding hand-off).
+  **`navigation/transitionVariant.ts`** is the single place that maps a
+  Grove<->World route to a variant — do not inline ad-hoc transition
+  choices in a screen. Current mapping: Grove→Missions = portal,
+  Missions→Grove = fold, Grove→Tale Trails = path, Grove→Treasure Hunt
+  = dissolve, Grove→The Beyond = portal, everything else returning to
+  Grove = fade.
+- **`navigation/RootNavigator.tsx`** — `navigateToWorld(target)` swaps
+  the active World at the transition's midpoint (same swap-mid-fade
+  pattern as the onboarding→Grove hand-off in §13), not at the end.
+- **`state/progressionStore.ts`** — local-first XP/level/coins/
+  adventure tickets/collector tokens/notifications. XP→level uses a
+  simple `floor(xp / 100) + 1` curve; notifications are stored as full
+  objects but the Grove only ever surfaces an unread dot, never a
+  count or list on the main canvas.
+- **`state/groveStore.ts`** — persists only visit timestamps. The
+  evolution *stage* (0/1/2) is always derived from
+  `progressionStore.level` via `evolutionStageForLevel` /
+  `groveBackgroundForStage` — never stored independently, so the Grove
+  can't desync from progression. Stage only ever increases visually.
+- **Supabase**: `grove_state` and `notifications` tables added (both
+  RLS-scoped to `auth.uid()`); `currencies` gained additive
+  `adventure_tickets` / `collector_tokens` columns via
+  `alter table ... add column if not exists` so the migration is safe
+  to re-run against an existing Batch 01/02 database. New
+  `services/supabase/grove.ts` and `services/supabase/notifications.ts`
+  follow the existing typed data-access pattern.
+- `Currencies` (`@apptypes`) gained the two fields above additively —
+  the existing `primary_currency`/`premium_currency` fields are
+  unchanged, per §11.
+
+## 18. What Batch 03 Explicitly Did NOT Implement
+
+- Real gameplay inside Missions, Tale Trails, Treasure Hunt, or The
+  Beyond — they remain placeholders, now reachable via their Grove
+  gateway and returnable via `ReturnToGrove`, per the master protocol.
+- Parent Space, Store, AR, any second visual theme — unchanged
+  deferral list from Batch 01/02.
+- Supabase syncing of the new progression/Grove/notification state
+  (local-first via Zustand `persist`, consistent with Batches 01-02;
+  the typed data-access functions exist for a future sync batch).
+- Real particle/illustration art for the Grove's ambient layer or
+  gateway portals — `GroveAmbient` is a procedural placeholder driven
+  purely by Reanimated math, and gateway art resolves to the existing
+  themed placeholder via the asset registry.
+- A literal radial/orbit layout for `WorldGateway` — Batch 03 ships a
+  wrapped horizontal arrangement of portals satisfying "not a tab bar,
+  not an arbitrary slide"; a true radial/orbit geometry can be layered
+  onto the same `GatewayDestination[]` data in a later batch without
+  changing the contract (per the original Batch 01 `BottomNav` note).

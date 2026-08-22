@@ -1,16 +1,16 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { View, StyleSheet } from "react-native";
-import { BottomNav, NavDestination, WorldTransition } from "@components/index";
-import { worldRegistry, WorldId } from "@worlds/WorldRegistry";
+import { WorldTransition } from "@components/index";
+import { WorldId } from "@worlds/WorldRegistry";
+import { transitionVariantFor } from "@navigation/transitionVariant";
+import { duration } from "@theme";
 import GroveWorld from "@worlds/worlds/Grove";
 import MissionsWorld from "@worlds/worlds/Missions";
 import TaleTrailsWorld from "@worlds/worlds/TaleTrails";
 import TreasureHuntWorld from "@worlds/worlds/TreasureHunt";
 import TheBeyondWorld from "@worlds/worlds/TheBeyond";
-import { Text } from "react-native";
-import { colors } from "@theme";
 
-const worldComponents: Record<WorldId, React.ComponentType> = {
+const worldComponents: Record<WorldId, React.ComponentType<{ onNavigateToWorld?: (w: WorldId) => void }>> = {
   grove: GroveWorld,
   missions: MissionsWorld,
   taleTrails: TaleTrailsWorld,
@@ -18,36 +18,51 @@ const worldComponents: Record<WorldId, React.ComponentType> = {
   theBeyond: TheBeyondWorld,
 };
 
-const destinations: NavDestination[] = (Object.keys(worldRegistry) as WorldId[]).map((id) => ({
-  key: id,
-  label: worldRegistry[id].displayName,
-  icon: <Text style={{ color: colors.text.secondary }}>●</Text>,
-}));
-
 /**
- * Root navigation shell. Uses the BottomNav component + WorldRegistry
- * so future batches only need to register a World, not build new
- * navigation plumbing. Radial nav for the Grove hub can wrap this
- * same state in a later batch.
+ * Root navigation shell. Batch 03 replaces the generic tab-bar
+ * world-switcher with gateway-based spatial navigation: the Grove
+ * renders `WorldGateway` portals, and every other World renders a
+ * `ReturnToGrove` affordance — both call back into this component's
+ * `navigateToWorld`, which picks a cinematic transition variant per
+ * route (see `transitionVariant.ts`) instead of one arbitrary slide
+ * for every swap. World components stay registered the same way as
+ * Batch 01 — a future World only needs registering, not new nav
+ * plumbing.
  */
 export function RootNavigator() {
   const [active, setActive] = useState<WorldId>("grove");
   const [transitioning, setTransitioning] = useState(false);
+  const [variant, setVariant] = useState<ReturnType<typeof transitionVariantFor>>("fade");
+  const pendingWorld = useRef<WorldId | null>(null);
+
   const ActiveWorld = worldComponents[active];
 
-  function handleSelect(key: string) {
-    if (key === active) return;
+  function navigateToWorld(target: WorldId) {
+    if (target === active || transitioning) return;
+    pendingWorld.current = target;
+    setVariant(transitionVariantFor(active, target));
     setTransitioning(true);
-    setTimeout(() => setActive(key as WorldId), 150);
+    // Swap the active World at the transition's midpoint (overlay at
+    // full coverage), the same swap-mid-fade pattern the onboarding
+    // hand-off into the Grove uses — see WONDERKIN_CONTINUITY §13.
+    setTimeout(() => {
+      if (pendingWorld.current) {
+        setActive(pendingWorld.current);
+        pendingWorld.current = null;
+      }
+    }, duration.worldTransition / 2);
+  }
+
+  function handleTransitionComplete() {
+    setTransitioning(false);
   }
 
   return (
     <View style={styles.root}>
       <View style={styles.content}>
-        <ActiveWorld />
+        <ActiveWorld onNavigateToWorld={navigateToWorld} />
       </View>
-      <BottomNav destinations={destinations} activeKey={active} onSelect={handleSelect} />
-      <WorldTransition active={transitioning} onComplete={() => setTransitioning(false)} />
+      <WorldTransition active={transitioning} variant={variant} onComplete={handleTransitionComplete} />
     </View>
   );
 }
