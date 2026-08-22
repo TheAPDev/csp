@@ -56,3 +56,22 @@ export interface InventoryItem {
   quantity: number;
   acquired_at: string;
 }
+
+/** WONDERKIN Shared Types — Batch 02 (first-time child journey) */
+
+/** The three mysterious eggs offered at first launch. Never shown to the child as labels. */
+export type EggId = "eggEmber" | "eggTide" | "eggWhisper";
+
+/**
+ * Five continuous internal Companion traits (0..1). These are never
+ * surfaced to the child as a number or grade — see Child UX Rule §9.
+ * Batches that read personality should read these, not invent a
+ * parallel trait system.
+ */
+export interface CompanionTraits {
+  heart: number;
+  courage: number;
+  curiosity: number;
+  voice: number;
+  bond: number;
+}

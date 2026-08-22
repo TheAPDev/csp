@@ -201,6 +201,13 @@ Store) will extend in later batches, not a finished nav system.
   `(progress: SharedValue<number>, config?) => void`.
 - RLS-scoped-to-owner pattern in Supabase tables.
 - The `@apptypes` alias name (not `@types`).
+- The `StoryBeat` contract (`src/story/types.ts`) — Batch 05 depends
+  on this shape being stable.
+- The `onboardingStore` `STEP_ORDER` sequencing and persisted-field
+  shape — extend with new steps if needed, don't reorder/rename
+  existing ones without checking `NO_BACK_STEPS` and `app/index.tsx`.
+- The rule that Companion traits (`CompanionTraits`) are never
+  rendered as a visible number/score.
 
 If a later batch believes one of these must change, **stop and ask
 the user** rather than redesigning silently, per the master protocol's
@@ -211,3 +218,82 @@ Conflict Rule.
 Per the master protocol's DO NOT list: Parent Space, full Missions,
 full Stories, full AR, Store, and any second visual theme. World
 screens beyond placeholders are intentionally deferred.
+
+## 13. First-Time Child Journey (`src/onboarding/`) — Batch 02
+
+The onboarding flow is a single-screen state machine, mirroring
+`RootNavigator`'s World-switch pattern rather than expo-router
+sub-routes (there's no back-stack to fight — the flow is strictly
+linear except for the deliberate back affordance).
+
+- `onboardingStore.ts` (`src/state/`) — persisted (AsyncStorage) step
+  state machine. `STEP_ORDER` is the single source of truth for
+  sequencing: `welcome → account → begin → introStory → eggSelection
+  → hatching → companionReveal → naming → firstPromise → complete`.
+- `OnboardingFlow.tsx` — renders the current step's screen + the
+  shared back affordance. `hatching`, `welcome`, and `complete` are
+  intentionally not back-able (`canGoBack()`).
+- `app/index.tsx` gates between `OnboardingFlow` and `RootNavigator`
+  based on `onboardingStore.completed`, waiting for `hasHydrated`
+  before deciding — a fresh install never flashes the wrong screen,
+  and an app restart mid-flow resumes at the same step instead of
+  restarting. The hand-off into The Grove reuses the exact same
+  `WorldTransition` overlay + swap-mid-fade pattern `RootNavigator`
+  uses between Worlds — do not replace this with a plain navigate.
+- Account entry (`AccountEntryScreen`) always falls forward to
+  `advance()` even if Supabase is unconfigured or the request fails
+  (guest continuation) — onboarding must never dead-end a child on a
+  backend hiccup.
+- `restart()` exists on the store for QA/testing; it is not currently
+  wired to any UI.
+
+## 14. Story System (`src/story/`) — Batch 02, reusable for Batch 05
+
+A cinematic-story primitive pair, intentionally decoupled from the
+onboarding flow so **Batch 05 (full Tale Trails)** can reuse it as-is:
+
+- `StoryBeat` (`types.ts`) — `{ id, backgroundAssetId, speaker?, line?,
+  cameraEffect?, particles?, haptic? }`. Any future story sequence
+  should produce an array of these rather than inventing a new shape.
+- `StoryScene.tsx` — renders one beat: background + camera motion
+  (via the existing `cinematicCamera` transition primitive — no new
+  ad-hoc `withTiming` calls), optional `ParticleField`, optional
+  `Dialogue`.
+- `StoryPlayer.tsx` — sequences beats via **tap-to-advance as the
+  primary interaction**. Progression never depends solely on an
+  animation completing, so an interrupted/slow beat can never
+  soft-lock a child.
+- `ParticleField.tsx` — procedural placeholder particle renderer
+  driven by the existing `particleTransition` primitive. A future
+  batch's real particle system can swap the renderer without callers
+  (`StoryScene`, `HatchingScreen`) changing.
+
+## 15. Companion Trait Model (`src/state/companionStore.ts`) — Batch 02
+
+`CompanionTraits` (`@apptypes`) adds five continuous internal traits
+— `heart`, `courage`, `curiosity`, `voice`, `bond`, each `0..1`,
+default `0.5` (`bond` starts at `0.3`). Rules for every future batch:
+
+- **Never render a trait as a number or grade anywhere in UI.** No
+  "Heart: 72", no bar chart of traits. They are read internally only
+  (e.g. to pick a Companion reaction line or animation later).
+- Nudge traits with `nudgeTrait(trait, amount)` — small signed deltas
+  only (Batch 02 uses ±0.03–0.08 from egg choice + First Promise
+  choice), never a hard `set`.
+- `traits` and `name` are additive to the existing `mood`/`bondLevel`
+  contract — that contract is unchanged, just persisted now (see
+  §11: extend, don't restructure).
+
+## 16. What Batch 02 Explicitly Did NOT Implement
+
+Per the master protocol and to stay in scope for this batch only:
+
+- Real Companion mood-reaction authoring driven by the five traits
+  (traits are stored and nudged, but no screen yet reads them to
+  change behavior/copy — that's a natural Grove-batch follow-up).
+- Supabase profile/session syncing of onboarding results (Companion
+  name + traits persist locally via AsyncStorage only for now,
+  consistent with Batch 01's "local-first, sync is a future batch's
+  responsibility").
+- Any second visual theme, Parent Space, full Missions/Stories/AR/
+  Store — unchanged from Batch 01's deferral list.

@@ -35,6 +35,9 @@ export type AssetId =
   | "EGG_ONE"
   | "EGG_TWO"
   | "EGG_THREE"
+  // First-time onboarding (Batch 02)
+  | "ONBOARDING_WELCOME_BACKGROUND"
+  | "ONBOARDING_STORY_BACKGROUND"
   // Icons (semantic, not literal)
   | "ICON_XP"
   | "ICON_CURRENCY_PRIMARY"
@@ -70,6 +73,9 @@ export const assetRegistry: Record<AssetId, AssetEntry> = {
   EGG_ONE: { kind: "image", source: null },
   EGG_TWO: { kind: "image", source: null },
   EGG_THREE: { kind: "image", source: null },
+
+  ONBOARDING_WELCOME_BACKGROUND: { kind: "image", source: null },
+  ONBOARDING_STORY_BACKGROUND: { kind: "image", source: null },
 
   ICON_XP: { kind: "image", source: null },
   ICON_CURRENCY_PRIMARY: { kind: "image", source: null },
