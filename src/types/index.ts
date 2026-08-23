@@ -192,3 +192,36 @@ export interface NotificationItem {
   read: boolean;
   created_at: string;
 }
+
+/** WONDERKIN Shared Types — Batch 06 (Treasure Hunt) */
+
+export type TreasureBiomeId = "meadow" | "shoreline" | "woodland" | "any";
+
+/**
+ * A single demo treasure. `available: true` for all of these — this
+ * batch's dummy content is meant to be found, not sealed like an
+ * upcoming Tale Trails episode. Future content must be data-driven
+ * (master protocol §DUMMY CONTENT); adding a treasure means adding a
+ * row here, not new UI.
+ */
+export interface TreasureDefinition {
+  id: string;
+  /** Child-facing name. */
+  name: string;
+  biome: TreasureBiomeId;
+  iconAssetId: import("@assets/registry").AssetId;
+  /** Companion line shown when the marker first appears on screen. */
+  discoveryLine: string;
+  /** Companion line shown during the collection beat. */
+  collectLine: string;
+  reward: MissionReward;
+  /** Internal-only trait lean granted on collection. Never shown to the child. */
+  traitLean: Partial<CompanionTraits>;
+}
+
+export interface TreasureCollection {
+  id: string;
+  profile_id: string;
+  treasure_id: string;
+  collected_at: string;
+}

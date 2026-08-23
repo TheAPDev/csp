@@ -77,7 +77,16 @@ export type AssetId =
   | "STORY_TIDE_COVE_BG"
   | "STORY_TIDE_COVE_DEPTHS_BG"
   | "STORY_SEALED_CHAPTER"
-  | "FIRESIDE_BACKGROUND";
+  | "FIRESIDE_BACKGROUND"
+
+  // Treasure Hunt (Batch 06) — dummy demo treasures + collection FX
+  | "TREASURE_ACORN"
+  | "TREASURE_SHELL"
+  | "TREASURE_LANTERN_GEM"
+  | "TREASURE_FEATHER"
+  | "TREASURE_CRYSTAL"
+  | "TREASURE_STAR_FRAGMENT"
+  | "TREASURE_MARKER_GLOW";
 
 export type AssetKind = "image" | "audio";
 
@@ -148,6 +157,15 @@ export const assetRegistry: Record<AssetId, AssetEntry> = {
   STORY_TIDE_COVE_DEPTHS_BG: { kind: "image", source: null },
   STORY_SEALED_CHAPTER: { kind: "image", source: null },
   FIRESIDE_BACKGROUND: { kind: "image", source: null },
+
+  // Treasure Hunt (Batch 06)
+  TREASURE_ACORN: { kind: "image", source: null },
+  TREASURE_SHELL: { kind: "image", source: null },
+  TREASURE_LANTERN_GEM: { kind: "image", source: null },
+  TREASURE_FEATHER: { kind: "image", source: null },
+  TREASURE_CRYSTAL: { kind: "image", source: null },
+  TREASURE_STAR_FRAGMENT: { kind: "image", source: null },
+  TREASURE_MARKER_GLOW: { kind: "image", source: null },
 };
 
 export function getAsset(id: AssetId): AssetEntry {

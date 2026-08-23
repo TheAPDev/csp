@@ -512,3 +512,123 @@ within claude limits").
   the natural next one) or Treasure Hunt should come first — flag this
   to the user rather than assuming, since both are reasonable reads of
   "what's next."
+
+---
+
+## Batch 06 — Treasure Hunt
+
+**Status: BUILT LOCALLY. Tested. Push requested by user for this batch — pushing now.**
+
+### What was built
+
+- **AR abstraction layer** (`src/services/ar/`): `ARSessionProvider`
+  interface (`capabilities`, `start`/`stop`, `placeAnchor`/
+  `removeAnchor`, `subscribeAnchors`, `hitTest`) and
+  `CameraFallbackARProvider`, a polished fallback implementation using
+  deterministic screen-space anchors over the live camera feed — no
+  real plane detection/world tracking (`capabilities` reports this
+  honestly). Exported as a single swappable singleton
+  (`arSessionProvider`) so a future `ARKitSessionProvider`/
+  `ARCoreSessionProvider` needs zero caller changes. Native AR itself
+  is out of scope — this sandbox can't produce the custom dev
+  client/EAS build real ARKit/ARCore modules require, and the master
+  protocol explicitly permits a fallback in that case.
+- **Camera abstraction genuinely unified**: extracted Batch 04's
+  inline permission logic out of `missions/screens/CameraCaptureScreen.tsx`
+  into new `components/CameraPermissionGate.tsx` (loading / denied+
+  askable / denied-forever+Settings / cancel). Missions' camera screen
+  now uses it with byte-identical rendered behavior; Treasure Hunt's
+  `ExplorationScreen` uses the same gate. Satisfies the master
+  protocol's "Do not break Mission camera functionality. Reuse the
+  existing camera abstraction."
+- **Coarse location only** (`services/location/coarseLocation.ts`):
+  foreground + `Accuracy.Low`, reduced in-memory to one of three
+  biome buckets (`meadow`/`shoreline`/`woodland`), never stored/
+  logged/shown. Denial/failure falls back to `"meadow"`.
+- **Full Treasure Hunt flow** (`src/treasurehunt/`,
+  `TreasureHuntFlow.tsx` orchestrator, same pattern as
+  `MissionsFlow`/`TaleTrailsFlow`): `HuntEntryScreen` → 
+  `ExplorationScreen` (live camera, pulsing AR markers, one arrival
+  Companion line, minimal "Leave" control — no HUD clutter) →
+  `CollectionScreen` (reuses `ParticleField` from Batches 02/05,
+  haptics, `CompanionReaction`) → `TreasureRewardScreen` (mirrors
+  Missions' `RewardScreen` icon+amount-row layout) → keep exploring or
+  return to Grove.
+- Reward granting mirrors `MissionsFlow.grantReward` exactly:
+  `progressionStore` currency additions, `companionStore.nudgeTrait`
+  per treasure (never numeric), `pushNotification`, local history log
+  in new `state/treasureHuntStore.ts` (re-collectible demo treasures,
+  not a one-time flag), best-effort Supabase log via
+  `services/supabase/treasureHunt.ts`.
+- 6 data-driven demo treasures across meadow/shoreline/woodland/any
+  biomes (`treasurehunt/content/treasureDefinitions.ts`) — reuses the
+  existing `MissionReward` type rather than a parallel shape.
+- Interaction routes through `arSessionProvider.hitTest` against raw
+  tap coordinates (not a per-marker `Pressable`), matching how a real
+  AR raycast hit-test would work — kept faithful to the abstraction
+  rather than taking a shortcut just because the fallback doesn't
+  strictly need it.
+- New `@treasurehunt` path alias; 7 new placeholder-safe asset IDs (6
+  treasure icons + 1 marker-glow reserve). New Supabase table
+  `treasure_collections` (RLS-scoped, mirrors `mission_rewards`'s
+  log-not-flag shape). New dependency `expo-location@~17.0.1`
+  (SDK 51-compatible) with its config plugin registered in `app.json`
+  using coarse-only permission copy.
+- `/docs/WONDERKIN_CONTINUITY.md` updated: new §23 (Treasure Hunt & AR
+  architecture), §24 (explicit deferrals), and 4 new items in §11.
+
+### Testing performed
+
+- `npx tsc --noEmit` — **0 errors**.
+- `npx expo export --platform android` — **full Metro bundle
+  succeeded**: 1315 modules compiled with no build errors (up from
+  1285 in Batch 04).
+- `npx expo-doctor` — 14/17 checks passed, same 3 sandbox-network-only
+  failures as every prior batch (not a project defect).
+- Manually traced: `ExplorationScreen` mounts →
+  `arSessionProvider.start()` → anchors placed for the resolved
+  biome's treasures → markers render at their normalized positions →
+  a tap inside `hitTest`'s radius resolves to the correct
+  `TreasureDefinition` → `CollectionScreen` fires haptics + particles
+  → auto-advances to `TreasureRewardScreen` with the right reward row
+  set → "Keep Exploring" re-enters `ExplorationScreen` cleanly
+  (`arSessionProvider.stop()` on unmount, fresh anchors on remount).
+  Confirmed `CameraPermissionGate`'s three non-granted states render
+  with the exact same copy/layout Missions shipped in Batch 04.
+- Build artifacts (`dist/`, `.expo/`) removed before commit.
+
+### Explicitly deferred (per master protocol + this batch's own scope)
+
+- Real native ARKit/ARCore — fallback is the complete implementation
+  for this batch, explicitly permitted when full native AR isn't
+  reliably executable in the current development environment.
+- True proximity-based discovery via device heading/orientation
+  (`expo-sensors` or similar) — fallback anchors are visible
+  immediately rather than revealing as the camera points at them.
+  `ARAnchor.position` is already shaped for a native provider to
+  report true camera-relative coordinates without a contract change.
+- One-time-only collection / a "fully collected" state — demo
+  treasures are intentionally re-collectible (a history log, not a
+  flag), consistent with "polished demo content."
+- Real per-profile identity for the Supabase write — still
+  `"local-guest"`, same deferral as Missions/Tale Trails.
+- The Beyond, Parent Space, Store, a second visual theme, or any
+  change to Grove/Missions/Tale Trails — unchanged deferral list.
+
+### Push status
+
+**Pushed to `main`** on explicit user request for this batch ("then
+push it").
+
+### Next batch (Batch 07) should
+
+- Read this file and `WONDERKIN_CONTINUITY.md` first (§23/§24
+  especially).
+- Consider whether The Beyond (the last unbuilt magical World) or a
+  second Missions submission type (voice) should come first — flag
+  this to the user rather than assuming, per the same open question
+  Batch 05 left.
+- If real native AR is ever prioritized, `ARSessionProvider` is ready
+  to receive an `ARKitSessionProvider`/`ARCoreSessionProvider`
+  implementation behind `services/ar/index.ts`'s single construction
+  line — no `ExplorationScreen` changes needed.

@@ -1,36 +1,20 @@
 import React from "react";
-import { Text, StyleSheet, SafeAreaView } from "react-native";
-import { WorldScene } from "@worlds/WorldScene";
-import { worldRegistry, WorldId } from "@worlds/WorldRegistry";
-import { typography, colors, spacing } from "@theme";
-import { ReturnToGrove } from "@components/index";
+import { WorldId } from "@worlds/WorldRegistry";
+import { TreasureHuntFlow } from "@treasurehunt/TreasureHuntFlow";
 
 interface TreasureHuntWorldProps {
   onNavigateToWorld?: (world: WorldId) => void;
 }
 
 /**
- * Placeholder World screen for "TreasureHunt". Scaffolding only — full
- * gameplay for this World is out of scope for Batch 03 per the
- * master rule (DO NOT implement full Missions/Stories/AR/Store).
- * Reachable only via its Grove gateway (see WorldGateway) — the
- * bottom tab bar no longer switches between the five main Worlds.
+ * Treasure Hunt World entry point (Batch 06). Renders the full AR/
+ * camera exploration system via `TreasureHuntFlow` — reachable only
+ * through its Grove gateway, same as every other World (see
+ * WorldGateway / RootNavigator). The flow's own entry and reward
+ * screens use `ReturnToGrove`, same affordance every other World
+ * uses; the live exploration screen uses its own minimal "Leave"
+ * control instead (a full-width button would clutter a camera view).
  */
 export default function TreasureHuntWorld({ onNavigateToWorld }: TreasureHuntWorldProps) {
-  const def = worldRegistry.treasureHunt;
-  return (
-    <WorldScene backgroundAssetId={def.backgroundAssetId}>
-      <SafeAreaView style={styles.safeArea}>
-        <Text style={styles.title}>{def.displayName}</Text>
-        <Text style={styles.subtitle}>Coming in a future batch.</Text>
-        <ReturnToGrove onPress={() => onNavigateToWorld?.("grove")} />
-      </SafeAreaView>
-    </WorldScene>
-  );
+  return <TreasureHuntFlow onReturnToGrove={() => onNavigateToWorld?.("grove")} />;
 }
-
-const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
-  title: { ...typography.title, color: colors.text.primary, margin: spacing.xl },
-  subtitle: { ...typography.body, color: colors.text.secondary, marginHorizontal: spacing.xl },
-});

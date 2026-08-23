@@ -240,6 +240,30 @@ Store) will extend in later batches, not a finished nav system.
   completion — do not add a new table for this until Tale Trails
   actually needs true multi-chapter tracking; `chapter_index` as a 0/1
   flag is intentional, not an oversight (Batch 05).
+- The `ARSessionProvider` interface (`services/ar/ARSessionProvider.ts`)
+  — a native ARKit/ARCore provider must implement it with the same
+  method signatures (`start`/`stop`/`placeAnchor`/`removeAnchor`/
+  `subscribeAnchors`/`hitTest`) so `ExplorationScreen` needs zero
+  changes when it's swapped in via `services/ar/index.ts`'s single
+  construction line. Never add a Treasure-Hunt-specific escape hatch
+  that bypasses this interface (Batch 06).
+- `CameraPermissionGate` (`components/CameraPermissionGate.tsx`) is
+  now THE camera permission UI for the whole app — Missions'
+  `CameraCaptureScreen` and Treasure Hunt's `ExplorationScreen` both
+  use it. A third camera-using World must reuse it too, not fork a
+  new permission flow (Batch 06).
+- Treasure/Mission reward-granting shape stays aligned: XP/coins/
+  currencies via `progressionStore`, trait nudges via
+  `companionStore.nudgeTrait`, a `pushNotification` call, then a
+  best-effort Supabase log — see `TreasureHuntFlow.grantReward` /
+  `MissionsFlow.grantReward`. A future reward-granting World should
+  follow the same shape rather than inventing a parallel one
+  (Batch 06).
+- Coarse location: `services/location/coarseLocation.ts` never
+  returns or stores the raw coordinate past the function's own scope
+  — it returns only a coarse biome label. Do not add a caller that
+  reads `position.coords` directly instead of going through this
+  function (Batch 06).
 
 If a later batch believes one of these must change, **stop and ask
 the user** rather than redesigning silently, per the master protocol's
@@ -555,3 +579,100 @@ home → detail → player → Fireside → reward → home).
 - Treasure Hunt, The Beyond, Parent Space, Store, AR, a second visual
   theme, or any change to Grove/Missions — unchanged deferral list;
   neither was touched in this batch.
+
+## 23. Treasure Hunt & AR Architecture (`src/treasurehunt/`, `src/services/ar/`) — Batch 06
+
+The camera becomes the exploration surface. Structure, and what
+future batches must not break:
+
+- **AR abstraction layer** (`services/ar/`). `ARSessionProvider` is a
+  backend-agnostic interface: `capabilities`, `start`/`stop`,
+  `placeAnchor`/`removeAnchor`, `subscribeAnchors`, `hitTest`.
+  `CameraFallbackARProvider` implements it today with fixed,
+  deterministic screen-space anchors over the live camera feed — no
+  real plane detection or world tracking, and `capabilities` reports
+  that honestly (`planeDetection: false`, `worldTracking: false`).
+  This is the master protocol's "polished camera fallback mode"
+  explicitly permitted when full native AR isn't reliably executable
+  in the current development environment (no custom dev client / EAS
+  build available in this sandbox for real ARKit/ARCore native
+  modules). `services/ar/index.ts` exports a single
+  `arSessionProvider` singleton — swapping to a native provider is
+  one constructor call, not a rewrite.
+- **Camera abstraction is now genuinely shared.** Batch 04's inline
+  permission-handling in `MissionsCameraCaptureScreen` was extracted
+  into `components/CameraPermissionGate.tsx` (loading / denied+askable
+  / denied-forever+Settings-link / cancel — same copy pattern,
+  parameterized by a `reason` line). `CameraCaptureScreen` was
+  refactored to use it with byte-identical rendered behavior; Treasure
+  Hunt's `ExplorationScreen` uses the same gate with its own reason
+  line. This satisfies the master protocol's explicit "Do not break
+  Mission camera functionality. Reuse the existing camera
+  abstraction."
+- **Coarse location only** (`services/location/coarseLocation.ts`).
+  Requests foreground + `Accuracy.Low` only, reduces the coordinate to
+  one of three `TreasureBiome` buckets in memory, and returns just the
+  label — the raw coordinate is never stored, logged, sent to
+  Supabase, or shown to the child. Denial/failure falls back to
+  `"meadow"` rather than blocking entry.
+- **Treasure Hunt flow** (`src/treasurehunt/`, orchestrated by
+  `TreasureHuntFlow.tsx`, same single-owner-of-sequencing pattern as
+  `MissionsFlow`/`TaleTrailsFlow`): Hunt entry → camera exploration
+  (`ExplorationScreen`, full-bleed, skips `WorldScene` like Missions'
+  camera step) → discovery (markers pulse into place, one arrival
+  `Dialogue` line, no counters/coordinates in the HUD) → interaction
+  (tap routes through `arSessionProvider.hitTest`, not a per-marker
+  `Pressable`, so the interaction model matches how a real AR raycast
+  hit-test would work) → collection (`CollectionScreen`, reusing
+  `ParticleField` from Batches 02/05 rather than a new particle
+  system, plus haptics + `CompanionReaction`) → reward
+  (`TreasureRewardScreen`, mirrors `missions/screens/RewardScreen.tsx`'s
+  icon+amount-row layout) → keep exploring or return to Grove.
+- **Reward granting mirrors Missions exactly**:
+  `TreasureHuntFlow.grantReward` calls `progressionStore`'s
+  add-currency actions, `companionStore.nudgeTrait` per
+  `TreasureDefinition.traitLean` (never shown as a number),
+  `pushNotification`, records to the local `treasureHuntStore`
+  (a history log, not a one-time flag — demo treasures are
+  re-collectible), and best-effort logs to the new
+  `treasure_collections` Supabase table via
+  `services/supabase/treasureHunt.ts`.
+- **Dummy content is fully data-driven**:
+  `treasurehunt/content/treasureDefinitions.ts` — 6 treasures across
+  `meadow` / `shoreline` / `woodland` / `any` biomes, each with a
+  name, discovery line, collect line, `MissionReward` (reused type,
+  not a parallel shape), and trait lean. Adding a treasure is a
+  content-file change, never a new screen.
+- **No new visual language**: markers reuse the same jewel-glow
+  language as `WorldGateway`'s portal glow (`shadows.glow` /
+  `colors.accent.secondary`), the "Leave" control mirrors Missions'
+  camera-screen cancel button styling exactly, and every non-camera
+  screen renders through the same `WorldScene` /
+  `TREASURE_HUNT_BACKGROUND` every other World uses.
+- New `@treasurehunt` path alias. 7 new placeholder-safe asset IDs (6
+  treasure icons + 1 unused marker-glow reserve). New Supabase table
+  `treasure_collections` (RLS-scoped to `auth.uid()`, mirrors
+  `mission_rewards`'s log-not-flag shape).
+
+## 24. What Batch 06 Explicitly Did NOT Implement
+
+- Real native ARKit/ARCore integration — `CameraFallbackARProvider` is
+  the full implementation for this batch; a native provider needs a
+  custom dev client / EAS build this sandbox can't produce, and the
+  master protocol explicitly permits the fallback in that case.
+- True proximity-based discovery (device heading/orientation via
+  gyroscope/magnetometer, e.g. `expo-sensors`) — fallback anchors are
+  visible immediately on entering exploration rather than revealing as
+  the camera physically points at them. Documented simplification of
+  the fallback, not a contract gap: `ARAnchor.position` is already
+  structured for a native provider to report true camera-relative
+  coordinates without a shape change.
+- One-time-only treasure collection / a "fully collected" end state —
+  demo treasures are intentionally re-collectible each visit (history
+  log, see `treasureHuntStore`), consistent with "polished demo
+  content" rather than a scarcity mechanic.
+- Real per-profile identity for the Supabase write — still the
+  `"local-guest"` placeholder, same deferral as Missions/Tale Trails.
+- The Beyond, Parent Space, Store, a second visual theme, or any
+  change to Grove/Missions/Tale Trails — unchanged deferral list;
+  none were touched in this batch.

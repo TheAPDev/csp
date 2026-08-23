@@ -21,7 +21,19 @@
         "backgroundColor": "#0B1026"
       }
     },
-    "plugins": ["expo-router", "expo-camera", "expo-av"],
+    "plugins": [
+      "expo-router",
+      "expo-camera",
+      "expo-av",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "WONDERKIN uses your rough area to pick which treasures appear nearby — never your exact location.",
+          "isAndroidBackgroundLocationEnabled": false,
+          "isAndroidForegroundServiceEnabled": false
+        }
+      ]
+    ],
     "extra": {
       "eas": {}
     }

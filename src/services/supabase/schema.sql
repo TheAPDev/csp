@@ -159,13 +159,32 @@ create table if not exists mission_rewards (
 alter table mission_progress add column if not exists last_submission_id uuid references mission_submissions(id);
 alter table mission_progress add column if not exists completed_at timestamptz;
 
+-- ============================================================
+-- Batch 06 — Treasure Hunt
+-- ============================================================
+
+-- One row per collection. Demo treasures are re-collectible (not a
+-- one-time flag), so this is a log, mirroring mission_rewards.
+create table if not exists treasure_collections (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid references profiles(id) on delete cascade,
+  treasure_id text not null,
+  xp int not null default 0,
+  coins int not null default 0,
+  adventure_tickets int not null default 0,
+  collector_tokens int not null default 0,
+  collected_at timestamptz not null default now()
+);
+
 alter table mission_definitions enable row level security;
 alter table mission_submissions enable row level security;
 alter table mission_rewards enable row level security;
+alter table treasure_collections enable row level security;
 
 create policy "Public read mission definitions" on mission_definitions for select using (true);
 create policy "Own mission submissions" on mission_submissions for all using (auth.uid() = profile_id);
 create policy "Own mission rewards" on mission_rewards for all using (auth.uid() = profile_id);
+create policy "Own treasure collections" on treasure_collections for all using (auth.uid() = profile_id);
 
 -- Row Level Security — every table restricted to its own profile owner
 alter table profiles enable row level security;

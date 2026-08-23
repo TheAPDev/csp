@@ -1,9 +1,8 @@
 import React, { useRef, useState } from "react";
-import { View, Text, Pressable, StyleSheet, Linking } from "react-native";
-import { CameraView, useCameraPermissions } from "expo-camera";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+import { CameraView } from "expo-camera";
 import * as Haptics from "expo-haptics";
-import { PrimaryButton } from "@components/PrimaryButton";
-import { SecondaryButton } from "@components/SecondaryButton";
+import { CameraPermissionGate } from "@components/CameraPermissionGate";
 import { colors, typography, spacing, radius, touchTarget } from "@theme";
 
 interface CameraCaptureScreenProps {
@@ -12,14 +11,15 @@ interface CameraCaptureScreenProps {
 }
 
 /**
- * Camera step of the photo submission flow. Handles every state the
- * master protocol calls out explicitly: denied permission (with a
- * path to Settings and a retry), cancel, and capture failure. Upload
- * failure/network failure are handled one step later, in the preview
- * screen's submit action.
+ * Camera step of the photo submission flow. Permission handling
+ * (denied/canAskAgain branching, loading, cancel) now lives in the
+ * shared `CameraPermissionGate` (Batch 06) — Treasure Hunt's
+ * exploration screen reuses the exact same gate rather than a
+ * parallel permission flow. This screen still owns everything
+ * specific to a single-shot photo capture: the shutter, capture
+ * failure handling, and the resulting URI handoff to preview.
  */
 export function CameraCaptureScreen({ onCaptured, onCancel }: CameraCaptureScreenProps) {
-  const [permission, requestPermission] = useCameraPermissions();
   const [capturing, setCapturing] = useState(false);
   const [captureError, setCaptureError] = useState(false);
   const cameraRef = useRef<CameraView>(null);
@@ -42,59 +42,36 @@ export function CameraCaptureScreen({ onCaptured, onCancel }: CameraCaptureScree
     }
   }
 
-  if (!permission) {
-    return (
-      <View style={styles.centeredRoot}>
-        <Text style={styles.message}>Getting the camera ready…</Text>
-      </View>
-    );
-  }
-
-  if (!permission.granted) {
-    const canAskAgain = permission.canAskAgain;
-    return (
-      <View style={styles.centeredRoot}>
-        <Text style={styles.title}>Camera access needed</Text>
-        <Text style={styles.message}>
-          {canAskAgain
-            ? "Your Companion needs the camera to see your mission photo."
-            : "Camera access is turned off. A grown-up can turn it back on in Settings."}
-        </Text>
-        {canAskAgain ? (
-          <PrimaryButton label="Allow Camera" onPress={requestPermission} style={styles.cta} />
-        ) : (
-          <PrimaryButton label="Open Settings" onPress={() => Linking.openSettings()} style={styles.cta} />
-        )}
-        <SecondaryButton label="Cancel" onPress={onCancel} style={styles.cta} />
-      </View>
-    );
-  }
-
   return (
-    <View style={styles.root}>
-      <CameraView ref={cameraRef} style={styles.camera} facing="back" />
-      {captureError && (
-        <View style={styles.errorBanner}>
-          <Text style={styles.errorText}>That didn't quite work — let's try again.</Text>
+    <CameraPermissionGate
+      reason="Your Companion needs the camera to see your mission photo."
+      onCancel={onCancel}
+    >
+      <View style={styles.root}>
+        <CameraView ref={cameraRef} style={styles.camera} facing="back" />
+        {captureError && (
+          <View style={styles.errorBanner}>
+            <Text style={styles.errorText}>That didn't quite work — let's try again.</Text>
+          </View>
+        )}
+        <View style={styles.controls}>
+          <Pressable onPress={onCancel} accessibilityRole="button" style={styles.cancelButton}>
+            <Text style={styles.cancelLabel}>Cancel</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              handleCapture();
+            }}
+            disabled={capturing}
+            accessibilityRole="button"
+            accessibilityLabel="Take photo"
+            style={[styles.shutter, capturing && styles.shutterBusy]}
+          />
+          <View style={styles.cancelButton} />
         </View>
-      )}
-      <View style={styles.controls}>
-        <Pressable onPress={onCancel} accessibilityRole="button" style={styles.cancelButton}>
-          <Text style={styles.cancelLabel}>Cancel</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-            handleCapture();
-          }}
-          disabled={capturing}
-          accessibilityRole="button"
-          accessibilityLabel="Take photo"
-          style={[styles.shutter, capturing && styles.shutterBusy]}
-        />
-        <View style={styles.cancelButton} />
       </View>
-    </View>
+    </CameraPermissionGate>
   );
 }
 
@@ -103,16 +80,6 @@ const SHUTTER_SIZE = 76;
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background.primary },
   camera: { flex: 1 },
-  centeredRoot: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: spacing.xxl,
-  },
-  title: { ...typography.title, color: colors.text.primary, textAlign: "center", marginBottom: spacing.sm },
-  message: { ...typography.body, color: colors.text.secondary, textAlign: "center", marginBottom: spacing.xl },
-  cta: { alignSelf: "stretch", marginBottom: spacing.md },
   controls: {
     position: "absolute",
     bottom: spacing.xxl,

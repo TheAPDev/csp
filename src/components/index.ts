@@ -22,3 +22,4 @@ export * from "./GroveAmbient";
 export * from "./WorldGateway";
 export * from "./TodaysAdventureCard";
 export * from "./ReturnToGrove";
+export * from "./CameraPermissionGate";

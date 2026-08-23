@@ -16,6 +16,7 @@ module.exports = function (api) {
             "@onboarding": "./src/onboarding",
             "@missions": "./src/missions",
       "@taletrails": "./src/taletrails",
+      "@treasurehunt": "./src/treasurehunt",
             "@assets": "./src/assets",
             "@navigation": "./src/navigation",
             "@services": "./src/services",
