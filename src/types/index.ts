@@ -44,6 +44,52 @@ export interface MissionProgress {
   updated_at: string;
 }
 
+/** WONDERKIN Shared Types — Batch 04 (Missions) */
+
+export type MissionCategory =
+  | "kindDeeds"
+  | "braveSparks"
+  | "curiousFinds"
+  | "storyVoices"
+  | "groveBonds";
+
+export type QuestLength = "quick" | "long";
+
+/**
+ * Every submission architecture the Missions system must support.
+ * Only "photo" is behaviorally implemented in Batch 04 — the rest
+ * exist as a stable contract so a later batch can wire them in
+ * without reshaping mission content or the verification service.
+ */
+export type SubmissionType =
+  | "photo"
+  | "voice"
+  | "video"
+  | "reflection"
+  | "quiz"
+  | "guardian"
+  | "location";
+
+export interface MissionReward {
+  xp: number;
+  coins: number;
+  adventureTickets?: number;
+  collectorTokens?: number;
+}
+
+export interface MissionDefinition {
+  id: string;
+  category: MissionCategory;
+  length: QuestLength;
+  title: string;
+  /** Child-facing task description — never mentions a trait by name. */
+  prompt: string;
+  submissionType: SubmissionType;
+  reward: MissionReward;
+  /** Internal-only trait lean granted on completion. Never shown to the child. */
+  traitLean: Partial<CompanionTraits>;
+}
+
 export interface StoryProgress {
   id: string;
   profile_id: string;

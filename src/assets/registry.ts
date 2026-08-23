@@ -50,6 +50,16 @@ export type AssetId =
   | "GATEWAY_TALE_TRAILS"
   | "GATEWAY_TREASURE_HUNT"
   | "GATEWAY_THE_BEYOND"
+  // Missions (Batch 04)
+  | "MISSION_CARD_KIND_DEEDS"
+  | "MISSION_CARD_BRAVE_SPARKS"
+  | "MISSION_CARD_CURIOUS_FINDS"
+  | "MISSION_CARD_STORY_VOICES"
+  | "MISSION_CARD_GROVE_BONDS"
+  | "REWARD_XP_SPARKLE"
+  | "REWARD_COIN"
+  | "REWARD_ADVENTURE_TICKET"
+  | "REWARD_COLLECTOR_TOKEN"
   // Icons (semantic, not literal)
   | "ICON_XP"
   | "ICON_CURRENCY_PRIMARY"
@@ -91,6 +101,18 @@ export const assetRegistry: Record<AssetId, AssetEntry> = {
 
   ONBOARDING_WELCOME_BACKGROUND: { kind: "image", source: null },
   ONBOARDING_STORY_BACKGROUND: { kind: "image", source: null },
+
+  // Missions (Batch 04) — one card art per category, shared across
+  // that category's missions until real per-mission art is supplied.
+  MISSION_CARD_KIND_DEEDS: { kind: "image", source: null },
+  MISSION_CARD_BRAVE_SPARKS: { kind: "image", source: null },
+  MISSION_CARD_CURIOUS_FINDS: { kind: "image", source: null },
+  MISSION_CARD_STORY_VOICES: { kind: "image", source: null },
+  MISSION_CARD_GROVE_BONDS: { kind: "image", source: null },
+  REWARD_XP_SPARKLE: { kind: "image", source: null },
+  REWARD_COIN: { kind: "image", source: null },
+  REWARD_ADVENTURE_TICKET: { kind: "image", source: null },
+  REWARD_COLLECTOR_TOKEN: { kind: "image", source: null },
 
   GROVE_BACKGROUND_BLOOM: { kind: "image", source: null },
   GROVE_BACKGROUND_RADIANT: { kind: "image", source: null },

@@ -107,6 +107,66 @@ create table if not exists notifications (
   created_at timestamptz not null default now()
 );
 
+-- ============================================================
+-- Batch 04 — Missions
+-- ============================================================
+
+-- Mission definitions are reference content, not per-profile data —
+-- readable by any signed-in profile. The app ships with a local seed
+-- (src/missions/content/missionDefinitions.ts) and falls back to it
+-- if this table is empty/unreachable, so Missions never depends on a
+-- live Supabase connection to be playable.
+create table if not exists mission_definitions (
+  id text primary key,
+  category text not null,
+  quest_length text not null check (quest_length in ('quick', 'long')),
+  title text not null,
+  prompt text not null,
+  submission_type text not null,
+  reward jsonb not null,
+  created_at timestamptz not null default now()
+);
+
+-- One row per attempt. `photo` is the only submission_type with a
+-- real capture/verify flow in Batch 04; others are accepted here for
+-- forward-compatibility but not yet produced by the app.
+create table if not exists mission_submissions (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid references profiles(id) on delete cascade,
+  mission_id text not null,
+  submission_type text not null,
+  status text not null default 'pending' check (status in ('pending', 'approved', 'retry')),
+  companion_feedback text,
+  created_at timestamptz not null default now()
+);
+
+-- One row per granted reward (kept separate from mission_progress so
+-- a mission's full reward history is queryable, e.g. for a future
+-- Parent Space summary).
+create table if not exists mission_rewards (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid references profiles(id) on delete cascade,
+  mission_id text not null,
+  xp int not null default 0,
+  coins int not null default 0,
+  adventure_tickets int not null default 0,
+  collector_tokens int not null default 0,
+  granted_at timestamptz not null default now()
+);
+
+-- Extend the existing Batch 01 mission_progress table rather than
+-- replace it — see WONDERKIN_CONTINUITY "extend, don't restructure".
+alter table mission_progress add column if not exists last_submission_id uuid references mission_submissions(id);
+alter table mission_progress add column if not exists completed_at timestamptz;
+
+alter table mission_definitions enable row level security;
+alter table mission_submissions enable row level security;
+alter table mission_rewards enable row level security;
+
+create policy "Public read mission definitions" on mission_definitions for select using (true);
+create policy "Own mission submissions" on mission_submissions for all using (auth.uid() = profile_id);
+create policy "Own mission rewards" on mission_rewards for all using (auth.uid() = profile_id);
+
 -- Row Level Security — every table restricted to its own profile owner
 alter table profiles enable row level security;
 alter table companion_state enable row level security;

@@ -210,6 +210,12 @@ Store) will extend in later batches, not a finished nav system.
   existing ones without checking `NO_BACK_STEPS` and `app/index.tsx`.
 - The rule that Companion traits (`CompanionTraits`) are never
   rendered as a visible number/score.
+- The `MissionVerificationService` interface shape
+  (`services/verification/MissionVerificationService.ts`) — a real AI
+  backend must implement `verify()` with the same signature, so no
+  screen needs to change when it's swapped in.
+- Mission category labels (`categoryLabel`) must stay flavor words,
+  never a literal trait name — that reads as a school-style score.
 - The Grove's single-status-surface rule — `StatusHub` is the only
   place XP/Level/Coins/Adventure Tickets/Collector Tokens/
   Notifications render; don't add a second status readout to the
@@ -393,3 +399,82 @@ unobtrusive status surface.
   not an arbitrary slide"; a true radial/orbit geometry can be layered
   onto the same `GatewayDestination[]` data in a later batch without
   changing the contract (per the original Batch 01 `BottomNav` note).
+
+## 19. Missions System (`src/missions/`) — Batch 04
+
+Missions is the first World with real gameplay (replacing the Batch
+01/03 placeholder at `worlds/worlds/Missions.tsx`, which now just
+renders `MissionsFlow`). It follows the same orchestrator pattern as
+`OnboardingFlow`: one component owns step sequencing, each step owns
+its own screen.
+
+- **Content** (`missions/content/missionDefinitions.ts`) — a static
+  local seed of `MissionDefinition[]`, mirroring the shape of the new
+  `mission_definitions` Supabase table. `services/supabase/missions.ts`
+  reads Supabase first and falls back to this seed on any error/empty
+  result — Missions must stay playable with no backend, same
+  philosophy as onboarding's guest-continuation path.
+- **Categories are flavor, not a scoreboard**: `kindDeeds`,
+  `braveSparks`, `curiousFinds`, `storyVoices`, `groveBonds` map
+  loosely to the five Companion traits but are never named as traits
+  in any child-facing copy — see `categoryLabel` vs. each mission's
+  internal-only `traitLean`. Never add a filter/label that says a
+  trait name directly (e.g. never a "Courage" chip) — that reads as a
+  school-style score, per the master protocol's §VALUES rule.
+- **Submission architecture**: `SubmissionType` (`@apptypes`) covers
+  photo/voice/video/reflection/quiz/guardian/location. **Only `photo`
+  has a real flow in Batch 04** — `MissionDetailScreen` shows a gentle
+  "still waking up" message for any other type rather than crashing
+  or faking a flow. When implementing another type, follow the same
+  camera→preview→verify→reward shape; don't invent a parallel one.
+- **`MissionVerificationService`** (`services/verification/`) — UI-
+  independent interface + `MockMissionVerificationService`. Approves
+  ~85% of the time with a Companion-voiced line; a real AI backend
+  swaps in behind the same `verify()` signature later with **no
+  caller change**. Never render technical AI language (confidence
+  scores, model names) anywhere near this — only `companionLine`.
+- **Camera flow** (`missions/screens/CameraCaptureScreen.tsx`) — uses
+  `expo-camera`'s `CameraView` + `useCameraPermissions`. Explicitly
+  handles: permission denied (with `canAskAgain` branching to either
+  a request button or "Open Settings" via `Linking.openSettings()`),
+  cancel, and capture failure (try/catch around `takePictureAsync`).
+- **Upload failure** is handled one step later, in
+  `PhotoPreviewScreen`, via a simulated `services/missions/
+  submissionUpload.ts` (no real media backend exists yet — this
+  stands in for that network call, including an occasional simulated
+  failure, so the retry/cancel UI is exercised for real).
+- **Rewards** are specific per mission (XP, coins, and conditionally
+  Adventure Tickets / Collector Tokens), rendered as individual
+  icon+amount rows in `RewardScreen` — never one generic confetti
+  burst for every mission. Granting a reward also nudges the relevant
+  Companion trait(s) via the same `nudgeTrait` used by onboarding, and
+  pushes one `progressionStore` notification (surfaced only through
+  the Grove's existing `StatusHub` unread dot).
+- **`state/missionsStore.ts`** — local-first, persisted: per-mission
+  status (`not_started` / `in_progress` / `complete`) and a capped
+  completion history (most-recent-first), read by
+  `CompletionHistorySheet`.
+- **Supabase**: `mission_definitions` (public-read reference content),
+  `mission_submissions`, `mission_rewards` added; the existing Batch 01
+  `mission_progress` table is extended (not replaced) with
+  `last_submission_id` / `completed_at` columns. All three new
+  data-access functions in `services/supabase/missions.ts` are
+  best-effort/fire-and-forget — they never block or throw into the UI.
+- New `@missions` path alias; 9 new placeholder-safe asset IDs (5
+  mission-category card art, 4 reward icons).
+
+## 20. What Batch 04 Explicitly Did NOT Implement
+
+- Any submission type other than `photo` behaviorally (voice, video,
+  reflection, quiz, guardian, location are typed/content-tagged only).
+- A real AI verification backend — `MockMissionVerificationService`
+  only, behind the stable `MissionVerificationService` interface.
+- A real media upload backend — `submissionUpload.ts` simulates the
+  network call so failure/retry handling is real and testable.
+- Any per-profile identity plumbing for Supabase writes — calls
+  currently pass a placeholder `"local-guest"` profile id since
+  Supabase auth→profile wiring hasn't landed yet (see Batch 01/02's
+  deferred sync layer). A future batch should thread the real
+  authenticated profile id through here once it exists.
+- Tale Trails, Treasure Hunt, The Beyond, Parent Space, Store, AR, any
+  second visual theme — unchanged deferral list.

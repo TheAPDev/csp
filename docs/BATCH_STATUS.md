@@ -296,3 +296,87 @@ gate, awaiting the user's explicit "YES, PUSH" before any commit/push.
   natural next step, since Today's Adventure already points at it).
 - Consider wiring `StatusHub`'s notification unread-dot to real
   Companion/adventure events rather than manual test pushes.
+
+---
+
+## Batch 04 — Missions System
+
+**Status: BUILT LOCALLY. Tested. Awaiting explicit "YES, PUSH" approval.**
+
+### What was built
+
+- Full Missions entry (`src/missions/`): category filter chips +
+  Quick/Long length toggle, Quick Quests (horizontal scroll), Long
+  Quests (vertical list), mission detail, and a Completion History
+  sheet. Reachable only via the Grove gateway, same as every other
+  World — `worlds/worlds/Missions.tsx` now renders `MissionsFlow`
+  instead of the Batch 01/03 placeholder.
+- Full **photo submission flow**: Mission → complete task → camera
+  (real permission handling: denied/canAskAgain branching to request-
+  or-Settings, cancel, capture failure) → preview → simulated upload
+  (retry/cancel on failure) → Companion verification → feedback →
+  reward.
+- `MissionVerificationService` (`services/verification/`) — UI-
+  independent interface + `MockMissionVerificationService`
+  (~85% approve rate, Companion-voiced feedback only, never technical
+  AI language). Swappable for a real backend later with no caller change.
+- Rewards (XP, coins, conditionally Adventure Tickets / Collector
+  Tokens) rendered as specific icon+amount rows, not generic confetti.
+  Granting a reward also nudges the relevant Companion trait(s)
+  (never shown as a number) and pushes one progression notification.
+- 9 mission definitions across 5 categories (`kindDeeds`,
+  `braveSparks`, `curiousFinds`, `storyVoices`, `groveBonds`) seeded
+  locally (`missions/content/missionDefinitions.ts`); only `photo`-
+  type missions have a real end-to-end flow — others show a gentle
+  "still waking up" message in mission detail rather than a fake flow.
+- `state/missionsStore.ts` — local-first persisted per-mission status
+  + capped completion history.
+- Supabase: `mission_definitions` (public-read), `mission_submissions`,
+  `mission_rewards` tables added; existing `mission_progress` table
+  extended (not replaced) with `last_submission_id` / `completed_at`.
+  All new Supabase calls in `services/supabase/missions.ts` are
+  best-effort/fire-and-forget.
+- New `@missions` path alias; 9 new placeholder-safe asset IDs (5
+  category card art, 4 reward icons).
+
+### Testing performed
+
+- `npx tsc --noEmit` — **0 errors**.
+- `npx expo export --platform android` — **full Metro bundle
+  succeeded**: 1285 modules compiled with no build errors (up from
+  1265 in Batch 03).
+- Traced the full photo flow step graph in `MissionsFlow`: home →
+  detail → camera → preview → verifying → reward → home, confirming
+  each transition's callback wiring and that a "retry" verification
+  outcome correctly routes back to the camera step rather than reward.
+- Confirmed non-photo mission types render the "still waking up"
+  message in `MissionDetailScreen` instead of attempting a flow.
+- Build artifacts (`dist/`, `.expo/`) removed before commit.
+
+### Explicitly deferred (per master protocol + Batch 04 instructions)
+
+- Submission types other than photo (voice, video, reflection, quiz,
+  guardian, location) — typed and content-tagged, not behaviorally
+  implemented.
+- A real AI verification backend and a real media upload backend —
+  both are mocked/simulated behind stable interfaces for this batch.
+- Real per-profile identity for Supabase writes — calls currently use
+  a placeholder `"local-guest"` id pending real auth→profile wiring.
+- Tale Trails, Treasure Hunt, The Beyond, Parent Space, Store, AR, any
+  second visual theme, and any redesign of Grove — unchanged deferral
+  list; Grove itself was not touched in this batch.
+
+### Push status
+
+**NOT pushed yet at time of writing this section** — per the approval
+gate, awaiting the user's explicit "YES, PUSH" before any commit/push.
+
+### Next batch (Batch 05) should
+
+- Read this file and `WONDERKIN_CONTINUITY.md` first.
+- Build out Tale Trails (Stories), reusing the Story System
+  (`src/story/`) built in Batch 02 — `StoryBeat` / `StoryScene` /
+  `StoryPlayer` / `ParticleField` are the intended reusable primitives.
+- Consider wiring a second submission type (voice is the most natural
+  next one, given `Voice of Your Own` and `Story in Motion` are
+  already seeded) onto the same camera→preview→verify→reward shape.
