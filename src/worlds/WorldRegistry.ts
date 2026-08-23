@@ -1,6 +1,6 @@
 import { AssetId } from "@assets/registry";
 
-export type WorldId = "grove" | "missions" | "taleTrails" | "treasureHunt" | "theBeyond";
+export type WorldId = "grove" | "missions" | "taleTrails" | "treasureHunt" | "theBeyond" | "closet" | "vault";
 
 export interface WorldDefinition {
   id: WorldId;
@@ -20,4 +20,6 @@ export const worldRegistry: Record<WorldId, WorldDefinition> = {
   taleTrails: { id: "taleTrails", displayName: "Tale Trails", backgroundAssetId: "TALE_TRAILS_BACKGROUND" },
   treasureHunt: { id: "treasureHunt", displayName: "Treasure Hunt", backgroundAssetId: "TREASURE_HUNT_BACKGROUND" },
   theBeyond: { id: "theBeyond", displayName: "The Beyond", backgroundAssetId: "THE_BEYOND_BACKGROUND" },
+  closet: { id: "closet", displayName: "Companion's Closet", backgroundAssetId: "CLOSET_BACKGROUND" },
+  vault: { id: "vault", displayName: "The Vault", backgroundAssetId: "VAULT_BACKGROUND" },
 };

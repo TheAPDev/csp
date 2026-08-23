@@ -4,29 +4,56 @@ import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanima
 import { colors } from "@theme";
 import { particleTransition } from "@transitions";
 
+/** Which accent tone the particles render in — see Batch 07 note below. */
+export type ParticleTone = "secondary" | "positive" | "caution";
+
+const toneColor: Record<ParticleTone, string> = {
+  secondary: colors.accent.secondary,
+  positive: colors.accent.positive,
+  caution: colors.accent.caution,
+};
+
 interface ParticleFieldProps {
   active: boolean;
   count?: number;
+  /**
+   * Added in Batch 07 so the economy's reward celebrations (coin vs.
+   * ticket vs. token) can each feel distinct without introducing a
+   * second color palette — every tone still comes from the existing
+   * `colors.accent` set. Defaults to "secondary" so every pre-Batch-07
+   * caller (story beats, egg hatching) renders byte-identical.
+   */
+  tone?: ParticleTone;
 }
 
 /**
- * Lightweight procedural particle overlay for cinematic story beats
- * and the egg-hatching reveal. Purely decorative and sound-ready (it
- * owns no audio itself, but a future batch's real particle/sound
- * system can hook the same `active` trigger without changing callers
- * in StoryScene or HatchingScreen).
+ * Lightweight procedural particle overlay for cinematic story beats,
+ * the egg-hatching reveal, and (as of Batch 07) reward celebrations.
+ * Purely decorative and sound-ready (it owns no audio itself, but a
+ * future batch's real particle/sound system can hook the same
+ * `active` trigger without changing callers).
  */
-export function ParticleField({ active, count = 10 }: ParticleFieldProps) {
+export function ParticleField({ active, count = 10, tone = "secondary" }: ParticleFieldProps) {
   return (
     <>
       {Array.from({ length: count }).map((_, i) => (
-        <Particle key={i} index={i} active={active} total={count} />
+        <Particle key={i} index={i} active={active} total={count} tone={tone} />
       ))}
     </>
   );
 }
 
-function Particle({ index, active, total }: { index: number; active: boolean; total: number }) {
+function Particle({
+  index,
+  active,
+  total,
+  tone,
+}: {
+  index: number;
+  active: boolean;
+  total: number;
+  tone: ParticleTone;
+}) {
   const progress = useSharedValue(0);
   const angle = (index / total) * Math.PI * 2;
   const radius = 90 + (index % 3) * 24;
@@ -50,7 +77,7 @@ function Particle({ index, active, total }: { index: number; active: boolean; to
     };
   });
 
-  return <Animated.View pointerEvents="none" style={[styles.dot, animatedStyle]} />;
+  return <Animated.View pointerEvents="none" style={[styles.dot, { backgroundColor: toneColor[tone] }, animatedStyle]} />;
 }
 
 const styles = StyleSheet.create({
@@ -61,6 +88,5 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: colors.accent.secondary,
   },
 });

@@ -676,3 +676,87 @@ future batches must not break:
 - The Beyond, Parent Space, Store, a second visual theme, or any
   change to Grove/Missions/Tale Trails — unchanged deferral list;
   none were touched in this batch.
+
+## 25. Companion's Closet & The Vault Architecture (Batch 07)
+
+- **Three currencies, three distinct roles** — enforced in code, not
+  just copy: `coins` (frequent, small/cosmetic), `adventureTickets`
+  (aspirational, story/event unlocks), `collectorTokens` (rare,
+  prestige/physical). `CosmeticItemDefinition.currency` and
+  `VaultRewardDefinition` (Vault is Collector-Tokens-only) are the
+  single source of truth for which currency an item costs — never a
+  mixed-currency price anywhere in either catalog.
+- **XP stays non-purchasable.** Batch 07 adds no path from any
+  currency to XP or level — mastery/progression is earned only
+  through Missions/Tale Trails/Treasure Hunt completion, unchanged
+  from Batch 01/04/05/06.
+- **`src/closet/`** — `content/catalog.ts` (dummy `CosmeticItemDefinition[]`
+  across all 8 categories from the master protocol: outfits,
+  accessories, expressions, titles, badges, homeDecor, profileThemes,
+  collectorCards), `components/ItemCard.tsx`, `screens/ClosetHomeScreen.tsx`
+  (categories + grid), `screens/ItemPreviewScreen.tsx` (preview → buy
+  → equip), `ClosetFlow.tsx` orchestrator — same single-owner-of-
+  sequencing pattern as `MissionsFlow`.
+- **`src/vault/`** — `content/vaultCatalog.ts` (dummy `VaultRewardDefinition[]`),
+  `components/VaultRewardCard.tsx` (the "340 / 500 Collector Tokens"
+  card from the spec, built on the existing `ProgressBar`),
+  `screens/VaultHomeScreen.tsx`, `screens/VaultRewardDetailScreen.tsx`
+  (locked vs. eligible), `screens/ParentHandoffScreen.tsx` (explicit
+  placeholder — collects nothing from the child), `VaultFlow.tsx`.
+- **Two new registered Worlds**: `closet` and `vault` in
+  `WorldRegistry`, each with a Grove gateway (`GATEWAY_CLOSET`,
+  `GATEWAY_VAULT`) and a `transitionVariantFor` entry (`closet` uses
+  `fold` both ways, mirroring Missions' Companion-adjacent feel;
+  `vault` uses `portal` in / `fade` out, matching Beyond's aspirational
+  weight). New `@closet`/`@vault` path aliases added to both
+  `tsconfig.json` and `babel.config.js`, following the exact existing
+  alias pattern.
+- **Currency safety (client)**: `closetStore.purchase` and
+  `vaultStore.requestRedemption` both check ownership/active-request
+  state AND balance BEFORE calling any `progressionStore.add*`
+  method — a purchase or redemption can never be attempted twice for
+  the same item/reward, and a balance can never be driven negative
+  from the Closet/Vault, because insufficient funds short-circuits
+  before any deduction happens.
+- **Currency safety (database)**: `currencies` gets a new
+  `check (... >= 0)` constraint (Batch 01/03's table, extended not
+  restructured); `cosmetic_inventory` has a `unique (profile_id,
+  item_id)` constraint (blocks a duplicate purchase at the DB layer,
+  not just client-side); `redemption_requests` has a partial unique
+  index on `(profile_id, reward_id) where status != 'fulfilled'`
+  (blocks a duplicate *active* redemption request while still
+  allowing a future request after fulfillment).
+- **`equipped_cosmetics`** is one row per profile with a `slots` jsonb
+  column (one item per `CosmeticCategory`) — mirrors the "equip"
+  concept without a parallel per-category table.
+- **Reward celebration variety**: `ParticleField` (Batch 02/05) gained
+  a `tone` prop (`"secondary" | "positive" | "caution"` — all existing
+  `colors.accent` values, no new palette) so `RewardCelebration`
+  (`src/components/`) can give Closet purchases, Vault progress, and
+  Vault redemption three visibly different celebrations (particle
+  count, Companion mood, haptic weight) without inventing a second
+  animation system or a new color palette. Existing `ParticleField`
+  callers (story beats, egg hatching) are unaffected — `tone` defaults
+  to `"secondary"`, the prior hardcoded color.
+- **No Store payment collection anywhere** — `ParentHandoffScreen` is
+  explicitly a placeholder per the master protocol's "Do NOT collect
+  payment information from the child" / "Do NOT implement real-money
+  purchases" rules; it only confirms the request was logged.
+
+## 26. What Batch 07 Explicitly Did NOT Implement
+
+- Parent Space itself — `redemption_requests` rows exist for a future
+  Parent Space batch to list/fulfill, but no parent-facing UI exists
+  yet.
+- A second economy or a fourth currency — exactly the existing three
+  (coins, adventureTickets, collectorTokens) are used; no new balance
+  type was added anywhere.
+- Any redesign of Grove, Missions, Tale Trails, or Treasure Hunt —
+  Grove gained two more `WorldGateway` entries (additive, same
+  component/props shape) and nothing else changed on that screen.
+- Real per-profile identity for the Supabase writes — still the
+  `"local-guest"` placeholder, same deferral as every prior batch.
+- Real illustrated art for any of the 26 new `AssetId`s — all resolve
+  to the existing themed placeholder via `AssetImage`.
+- The Beyond, a second visual theme, or real-money payment rails of
+  any kind.

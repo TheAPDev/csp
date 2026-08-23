@@ -632,3 +632,101 @@ push it").
   to receive an `ARKitSessionProvider`/`ARCoreSessionProvider`
   implementation behind `services/ar/index.ts`'s single construction
   line — no `ExplorationScreen` changes needed.
+
+---
+
+## Batch 07 — Economy & Reward World (Companion's Closet + The Vault)
+
+**Status: BUILT LOCALLY. Tested. Awaiting explicit "YES, PUSH" approval.**
+
+### What was built
+
+- **Three-currency economy**, unchanged from Batch 01/03's fields but
+  now with real spend paths and a purpose for each: Coins (frequent,
+  small/cosmetic), Adventure Tickets (aspirational, unlocks), Collector
+  Tokens (rare, prestige/Vault). XP remains non-purchasable — no code
+  path connects any currency to XP or level.
+- **Companion's Closet** (`src/closet/`): store entry, 8 category tabs
+  (outfits, accessories, expressions, titles, badges, home
+  decorations, profile themes, collector cards), item grid, item
+  preview, purchase, equip, owned/insufficient-currency states,
+  purchase celebration, Companion reaction line per item. 16 dummy
+  catalog items across the 8 categories in `content/catalog.ts`.
+- **The Vault** (`src/vault/`): reward catalog (`content/vaultCatalog.ts`,
+  3 dummy physical rewards), progress card matching the spec's
+  "Explorer Box — 340 / 500 Collector Tokens" example, locked vs.
+  eligible detail screen, redemption request, and an explicit parent
+  hand-off placeholder screen that collects nothing from the child.
+- **`RewardCelebration`** (`src/components/`) — a new shared,
+  variant-aware celebration (`purchase` / `vaultProgress` /
+  `redemption`), each with a different particle tone/count, Companion
+  mood, and haptic weight, per the master protocol's "do not use the
+  same celebration for every reward" rule. Built on the existing
+  `ParticleField` + `CompanionReaction`, not a new animation system.
+  `ParticleField` gained a `tone` prop (defaults to the prior
+  hardcoded color, so Batch 02/05 callers are unaffected).
+- **Two new registered Worlds**: `closet` and `vault`, each reachable
+  from a new Grove `WorldGateway` portal (Grove itself otherwise
+  unchanged) with their own `transitionVariantFor` entries. New
+  `@closet`/`@vault` path aliases.
+- **Client-side currency safety**: `closetStore.purchase` and
+  `vaultStore.requestRedemption` check ownership/active-request state
+  and balance BEFORE any deduction — a purchase/redemption can't be
+  duplicated and a balance can't go negative from either flow.
+- **Supabase**: new `cosmetic_inventory` (unique `profile_id, item_id`
+  — blocks duplicate purchase at the DB layer), `equipped_cosmetics`
+  (one row per profile, `slots` jsonb), `redemption_requests` (partial
+  unique index blocks a duplicate *active* request per reward); a new
+  `check (...>= 0)` constraint added to the existing `currencies`
+  table. New `services/supabase/closet.ts` and `services/supabase/vault.ts`.
+- `/docs/WONDERKIN_CONTINUITY.md` updated: new §25 (economy
+  architecture) and §26 (explicit deferrals).
+
+### Testing performed
+
+- `npm install` — succeeded, 1256 packages, no errors.
+- `npx tsc --noEmit` — **0 errors** (one type mismatch found and fixed
+  during the check: `ItemPreviewScreen`'s `onEquip` callback shape).
+- `npx expo export --platform android` — **full Metro bundle
+  succeeded**: 1333 modules compiled into a working Hermes bytecode
+  bundle with no build errors (up from 1315 in Batch 06, consistent
+  with the new Closet/Vault code added).
+- `npx expo-doctor` — 14/17 checks passed, same 3 sandbox-network-only
+  failures as every prior batch (not a project defect).
+- Manually traced: Grove gateway → `ClosetFlow` home → category tabs
+  filter correctly → item preview → insufficient-currency toast when
+  underfunded → successful purchase deducts the correct currency only
+  → ownership persists → Equip writes to `closetStore.equipped` and
+  the item card immediately shows "Equipped". Same trace for
+  `VaultFlow`: progress card reflects live Collector Token balance →
+  locked reward shows no redeem button → eligible reward's Redeem
+  request succeeds once, a second attempt on the same reward is
+  blocked by `hasActiveRequest` before any token is spent.
+- Build artifacts (`dist/`, `.expo/`) removed before commit.
+
+### Explicitly deferred (per master protocol + this batch's own scope)
+
+- Parent Space itself (redemption requests are logged for it, not
+  surfaced by it yet).
+- A second economy or fourth currency.
+- Any redesign of Grove, Missions, Tale Trails, or Treasure Hunt.
+- Real per-profile identity for the Supabase writes — still
+  `"local-guest"`, same deferral as every prior batch.
+- Real illustrated art for any of the 26 new asset IDs.
+- The Beyond, a second visual theme, real-money payment rails.
+
+### Push status
+
+**NOT pushed.** Per the approval gate, this batch is complete locally
+and waiting for the user to say "YES, PUSH" before any commit/push to
+the repository.
+
+### Next batch (Batch 08 of 10) should
+
+- Read this file and `WONDERKIN_CONTINUITY.md` first (§25/§26
+  especially).
+- Consider whether **The Beyond** (still the only unbuilt magical
+  World) or **Parent Space** (now has real data — redemption requests,
+  reward history — to surface) should come first; flag this to the
+  user rather than assuming, per the same open-question pattern
+  Batch 05/06 left.

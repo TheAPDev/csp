@@ -15,6 +15,10 @@ import { WorldTransitionVariant } from "@components/WorldTransition";
  *  - treasureHunt -> grove : fade
  *  - grove -> theBeyond  : portal  (visible path/portal at the edge, geographically connected)
  *  - theBeyond -> grove  : fade
+ *  - grove -> closet     : fold    (Companion's own space, folds inward like Missions' return)
+ *  - closet -> grove     : fold
+ *  - grove -> vault      : portal  (a special, aspirational destination — same weight as Missions/Beyond)
+ *  - vault -> grove      : fade
  */
 export function transitionVariantFor(from: WorldId, to: WorldId): WorldTransitionVariant {
   if (from === "grove") {
@@ -27,6 +31,10 @@ export function transitionVariantFor(from: WorldId, to: WorldId): WorldTransitio
         return "dissolve";
       case "theBeyond":
         return "portal";
+      case "closet":
+        return "fold";
+      case "vault":
+        return "portal";
       default:
         return "fade";
     }
@@ -34,6 +42,8 @@ export function transitionVariantFor(from: WorldId, to: WorldId): WorldTransitio
   if (to === "grove") {
     switch (from) {
       case "missions":
+        return "fold";
+      case "closet":
         return "fold";
       default:
         return "fade";

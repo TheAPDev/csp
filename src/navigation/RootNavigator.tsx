@@ -9,6 +9,8 @@ import MissionsWorld from "@worlds/worlds/Missions";
 import TaleTrailsWorld from "@worlds/worlds/TaleTrails";
 import TreasureHuntWorld from "@worlds/worlds/TreasureHunt";
 import TheBeyondWorld from "@worlds/worlds/TheBeyond";
+import ClosetWorld from "@worlds/worlds/Closet";
+import VaultWorld from "@worlds/worlds/Vault";
 
 const worldComponents: Record<WorldId, React.ComponentType<{ onNavigateToWorld?: (w: WorldId) => void }>> = {
   grove: GroveWorld,
@@ -16,6 +18,8 @@ const worldComponents: Record<WorldId, React.ComponentType<{ onNavigateToWorld?:
   taleTrails: TaleTrailsWorld,
   treasureHunt: TreasureHuntWorld,
   theBeyond: TheBeyondWorld,
+  closet: ClosetWorld,
+  vault: VaultWorld,
 };
 
 /**

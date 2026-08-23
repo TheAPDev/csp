@@ -225,3 +225,72 @@ export interface TreasureCollection {
   treasure_id: string;
   collected_at: string;
 }
+
+/** WONDERKIN Shared Types — Batch 07 (Companion's Closet & The Vault) */
+
+export type CosmeticCategory =
+  | "outfits"
+  | "accessories"
+  | "expressions"
+  | "titles"
+  | "badges"
+  | "homeDecor"
+  | "profileThemes"
+  | "collectorCards";
+
+/** Every economy purchase spends exactly one of these — never a mix. */
+export type CurrencyKind = "coins" | "adventureTickets" | "collectorTokens";
+
+export interface CosmeticItemDefinition {
+  id: string;
+  category: CosmeticCategory;
+  name: string;
+  /** One short, plain-language line — what it looks like or does, never a stat block. */
+  description: string;
+  previewAssetId: import("@assets/registry").AssetId;
+  price: number;
+  currency: CurrencyKind;
+  /** Companion line shown on purchase/equip — varies per item, not one generic "Nice!". */
+  companionLine: string;
+}
+
+export interface OwnedCosmeticItem {
+  id: string;
+  profile_id: string;
+  item_id: string;
+  acquired_at: string;
+}
+
+export interface EquippedCosmetics {
+  profile_id: string;
+  /** One equipped item per category (null = nothing equipped there). */
+  slots: Partial<Record<CosmeticCategory, string>>;
+  updated_at: string;
+}
+
+/** WONDERKIN Shared Types — The Vault (physical reward progression) */
+
+export interface VaultRewardDefinition {
+  id: string;
+  name: string;
+  description: string;
+  previewAssetId: import("@assets/registry").AssetId;
+  costCollectorTokens: number;
+}
+
+export interface VaultProgressRecord {
+  profile_id: string;
+  reward_id: string;
+  tokensContributed: number;
+  updated_at: string;
+}
+
+export type RedemptionStatus = "requested" | "parent_review" | "fulfilled";
+
+export interface RedemptionRequest {
+  id: string;
+  profile_id: string;
+  reward_id: string;
+  status: RedemptionStatus;
+  requested_at: string;
+}

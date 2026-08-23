@@ -17,6 +17,8 @@ module.exports = function (api) {
             "@missions": "./src/missions",
       "@taletrails": "./src/taletrails",
       "@treasurehunt": "./src/treasurehunt",
+      "@closet": "./src/closet",
+      "@vault": "./src/vault",
             "@assets": "./src/assets",
             "@navigation": "./src/navigation",
             "@services": "./src/services",

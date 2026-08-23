@@ -27,6 +27,8 @@ const gateways: Omit<GatewayDestination, "icon">[] = [
   { key: "taleTrails", label: worldRegistry.taleTrails.displayName, assetId: "GATEWAY_TALE_TRAILS", hint: "Step into a story" },
   { key: "treasureHunt", label: worldRegistry.treasureHunt.displayName, assetId: "GATEWAY_TREASURE_HUNT", hint: "Hunt for treasure" },
   { key: "theBeyond", label: worldRegistry.theBeyond.displayName, assetId: "GATEWAY_THE_BEYOND", hint: "A distant path" },
+  { key: "closet", label: worldRegistry.closet.displayName, assetId: "GATEWAY_CLOSET", hint: "Dress up your Companion" },
+  { key: "vault", label: worldRegistry.vault.displayName, assetId: "GATEWAY_VAULT", hint: "Real rewards await" },
 ];
 
 const REACTION_LINES: Record<CompanionMood, string> = {

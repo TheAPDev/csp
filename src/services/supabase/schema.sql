@@ -206,3 +206,58 @@ create policy "Own story progress" on story_progress for all using (auth.uid() =
 create policy "Own inventory" on inventory_items for all using (auth.uid() = profile_id);
 create policy "Own grove state" on grove_state for all using (auth.uid() = profile_id);
 create policy "Own notifications" on notifications for all using (auth.uid() = profile_id);
+
+-- ============================================================
+-- Batch 07 — Companion's Closet & The Vault (economy)
+-- ============================================================
+
+-- Currency-safety: the existing `currencies` table (Batch 01/03) never
+-- had a floor constraint. Add one now rather than restructure the
+-- table, per WONDERKIN_CONTINUITY "extend, don't restructure".
+alter table currencies add constraint currencies_non_negative
+  check (primary_currency >= 0 and premium_currency >= 0 and adventure_tickets >= 0 and collector_tokens >= 0);
+
+-- One row per owned cosmetic. The unique constraint is what actually
+-- prevents a duplicate purchase at the database layer (the client
+-- also checks ownership first in `closetStore`, but this is the
+-- source of truth against retried/concurrent requests).
+create table if not exists cosmetic_inventory (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid references profiles(id) on delete cascade,
+  item_id text not null,
+  acquired_at timestamptz not null default now(),
+  unique (profile_id, item_id)
+);
+
+-- One row per profile: which item is equipped in each category slot.
+create table if not exists equipped_cosmetics (
+  profile_id uuid primary key references profiles(id) on delete cascade,
+  slots jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+-- One row per Vault redemption request. Vault progress itself is not
+-- persisted separately — it is derived from the existing `currencies`
+-- table's `collector_tokens` balance, so there is nothing to desync.
+create table if not exists redemption_requests (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid references profiles(id) on delete cascade,
+  reward_id text not null,
+  status text not null default 'requested' check (status in ('requested', 'parent_review', 'fulfilled')),
+  requested_at timestamptz not null default now()
+);
+
+-- Prevents a duplicate *active* redemption request for the same
+-- reward (no duplicate reward in flight) without blocking a future
+-- request once the prior one is fulfilled.
+create unique index if not exists redemption_requests_active_unique
+  on redemption_requests (profile_id, reward_id)
+  where status != 'fulfilled';
+
+alter table cosmetic_inventory enable row level security;
+alter table equipped_cosmetics enable row level security;
+alter table redemption_requests enable row level security;
+
+create policy "Own cosmetic inventory" on cosmetic_inventory for all using (auth.uid() = profile_id);
+create policy "Own equipped cosmetics" on equipped_cosmetics for all using (auth.uid() = profile_id);
+create policy "Own redemption requests" on redemption_requests for all using (auth.uid() = profile_id);

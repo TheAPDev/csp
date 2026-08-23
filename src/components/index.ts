@@ -23,3 +23,4 @@ export * from "./WorldGateway";
 export * from "./TodaysAdventureCard";
 export * from "./ReturnToGrove";
 export * from "./CameraPermissionGate";
+export * from "./RewardCelebration";
