@@ -98,6 +98,47 @@ export interface StoryProgress {
   updated_at: string;
 }
 
+/** WONDERKIN Shared Types — Batch 05 (Tale Trails) */
+
+/**
+ * A lightweight branch offered mid-episode. Picking one plays a short
+ * reaction beat, then the story reconnects to the same closing beats
+ * regardless of choice — deliberately not a branching tree. Reuses
+ * `CompanionMood` (from `CompanionReaction`) rather than inventing a
+ * parallel mood enum.
+ */
+export interface StoryChoiceOption {
+  id: string;
+  label: string;
+  companionLine: string;
+  mood: import("@components/CompanionReaction").CompanionMood;
+}
+
+export interface StoryChoicePrompt {
+  speaker: string;
+  line: string;
+  options: [StoryChoiceOption, StoryChoiceOption];
+}
+
+export interface StoryEpisodeDefinition {
+  id: string;
+  title: string;
+  /** One-line hook shown on the discovery card. */
+  teaser: string;
+  /** Used as both the card's art and the first beat's implicit setting. */
+  thumbnailAssetId: import("@assets/registry").AssetId;
+  /** false = a beautifully "sealed" chapter, not a dead button — see `EpisodeCard`. */
+  available: boolean;
+  openingBeats: import("@story/types").StoryBeat[];
+  /** Omit for a purely linear episode — not every episode needs a branch. */
+  choice?: StoryChoicePrompt;
+  closingBeats: import("@story/types").StoryBeat[];
+  /** Companion's conversational reflection — never a "moral", never evaluative. */
+  firesideLine: string;
+  reward: MissionReward;
+  traitLean: Partial<CompanionTraits>;
+}
+
 export interface InventoryItem {
   id: string;
   profile_id: string;

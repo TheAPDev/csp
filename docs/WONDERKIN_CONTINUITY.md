@@ -204,7 +204,11 @@ Store) will extend in later batches, not a finished nav system.
 - RLS-scoped-to-owner pattern in Supabase tables.
 - The `@apptypes` alias name (not `@types`).
 - The `StoryBeat` contract (`src/story/types.ts`) — Batch 05 depends
-  on this shape being stable.
+  on this shape being stable, and Batch 05 itself changed nothing in
+  it, proving the contract holds: branching was built entirely at the
+  orchestration layer (`taletrails/screens/EpisodePlayerScreen.tsx`)
+  by sequencing two `StoryPlayer` instances around a separate
+  `ChoicePrompt` screen.
 - The `onboardingStore` `STEP_ORDER` sequencing and persisted-field
   shape — extend with new steps if needed, don't reorder/rename
   existing ones without checking `NO_BACK_STEPS` and `app/index.tsx`.
@@ -228,6 +232,14 @@ Store) will extend in later batches, not a finished nav system.
   transition variants (Batch 03).
 - `groveStore`'s evolution stage being *derived* from
   `progressionStore.level`, never stored/set independently (Batch 03).
+- Story rewards reuse the existing `MissionReward` shape (`@apptypes`)
+  rather than a parallel `StoryReward` type — any future reward-
+  granting World should do the same unless the shape genuinely can't
+  fit (Batch 05).
+- `story_progress` (Batch 01's table) is reused as-is for Tale Trails
+  completion — do not add a new table for this until Tale Trails
+  actually needs true multi-chapter tracking; `chapter_index` as a 0/1
+  flag is intentional, not an oversight (Batch 05).
 
 If a later batch believes one of these must change, **stop and ask
 the user** rather than redesigning silently, per the master protocol's
@@ -478,3 +490,68 @@ its own screen.
   authenticated profile id through here once it exists.
 - Tale Trails, Treasure Hunt, The Beyond, Parent Space, Store, AR, any
   second visual theme — unchanged deferral list.
+
+## 21. Tale Trails / Story World (`src/taletrails/`) — Batch 05
+
+The second World with real gameplay, following `MissionsFlow`'s
+orchestrator-owns-sequencing pattern exactly (`TaleTrailsFlow.tsx`:
+home → detail → player → Fireside → reward → home).
+
+- **Reuses Batch 02's Story System unmodified**: `StoryPlayer`,
+  `StoryScene`, `StoryBeat`, `ParticleField` all needed **zero**
+  changes. Branching (the "lightweight branching model" the batch
+  brief asked for) is built entirely one layer up, in
+  `taletrails/screens/EpisodePlayerScreen.tsx`: opening beats play
+  through one `StoryPlayer`; an optional two-way `choice` pauses via a
+  new `ChoicePrompt` screen (not a `StoryBeat` — deliberately kept out
+  of that contract); the chosen option plays one reaction beat through
+  a plain `StoryScene`; then `closingBeats` play through a *second*
+  `StoryPlayer`, reconnecting to the same ending regardless of choice.
+  Not every episode needs a `choice` at all ("Tide Cove Secrets" has
+  none) — `EpisodePlayerScreen` skips straight from opening to closing
+  beats when `episode.choice` is undefined.
+- **Content** (`taletrails/content/storyDefinitions.ts`) — a static
+  local seed of `StoryEpisodeDefinition[]`. 2 available episodes, 2
+  not-yet-available ("sealed") ones, so the discovery shelf reads as a
+  real library rather than a single lonely item. `{companionName}`
+  is a template token substituted at runtime (`withCompanionName`) so
+  content authors don't need to know the Companion's name ahead of
+  time.
+- **Sealed chapters are not a generic "Coming Soon" box**
+  (`taletrails/components/EpisodeCard.tsx`): same card layout as an
+  available episode, a slow Reanimated shimmer, in-world copy
+  ("still gathering starlight"). Tapping one never dead-ends — it
+  triggers a Companion `Toast` tease instead of navigating anywhere.
+- **Companion Fireside** (`screens/FiresideScreen.tsx`) — the
+  Companion reflects conversationally on the episode via each
+  episode's `firesideLine`. Explicitly not a "Moral of the Story" and
+  never evaluates the child's choice — any future episode's
+  `firesideLine` should read like a feeling, not a verdict.
+- **Rewards** reuse the exact Missions mechanism: `progressionStore`
+  (XP/coins/tickets/tokens), `companionStore.nudgeTrait`, a pushed
+  notification (`kind: "adventure"`), and a best-effort Supabase
+  write via `services/supabase/stories.ts`. `StoryRewardScreen` reuses
+  the existing `RewardBadge` component rather than a parallel reward
+  UI, and story rewards reuse the `MissionReward` type directly.
+- **Supabase**: no schema change. Reuses Batch 01's `story_progress`
+  table as-is; `chapter_index` is used as a simple 0/1 completion flag
+  for now (see §11) since Batch 05 episodes are single-session, not
+  multi-chapter sagas.
+- **World transition**: Grove ↔ Tale Trails already resolved to the
+  `path` variant via Batch 03's `transitionVariantFor` — no navigation
+  code changed for this batch.
+- New `@taletrails` path alias, mirroring `@missions`. 6 new
+  placeholder-safe asset IDs.
+
+## 22. What Batch 05 Explicitly Did NOT Implement
+
+- More than one two-way choice per episode, or any choice with more
+  than two options — matches the explicit "not a giant branching
+  tree" instruction.
+- Real illustrated/audio art for the 6 new asset IDs.
+- True multi-chapter stories (`chapter_index` beyond a 0/1 flag).
+- Real per-profile identity for the Supabase write — still the
+  `"local-guest"` placeholder, same deferral as Missions.
+- Treasure Hunt, The Beyond, Parent Space, Store, AR, a second visual
+  theme, or any change to Grove/Missions — unchanged deferral list;
+  neither was touched in this batch.

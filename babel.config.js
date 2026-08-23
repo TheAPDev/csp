@@ -15,6 +15,7 @@ module.exports = function (api) {
             "@story": "./src/story",
             "@onboarding": "./src/onboarding",
             "@missions": "./src/missions",
+      "@taletrails": "./src/taletrails",
             "@assets": "./src/assets",
             "@navigation": "./src/navigation",
             "@services": "./src/services",

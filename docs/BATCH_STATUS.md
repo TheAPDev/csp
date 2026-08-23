@@ -380,3 +380,135 @@ gate, awaiting the user's explicit "YES, PUSH" before any commit/push.
 - Consider wiring a second submission type (voice is the most natural
   next one, given `Voice of Your Own` and `Story in Motion` are
   already seeded) onto the same camera→preview→verify→reward shape.
+
+---
+
+## Batch 05 — Tale Trails (Story World)
+
+**Status: BUILT LOCALLY. Tested. Pushed per explicit user approval
+("continue and push it").**
+
+### What was built
+
+New `src/taletrails/` module (parallel to `src/missions/`, same
+orchestrator-owns-sequencing pattern as `MissionsFlow`):
+
+- **`content/storyDefinitions.ts`** — 4 episodes: 2 available
+  ("The Lantern Path" with a two-way choice, "Tide Cove Secrets" with
+  no choice — not every episode needs to branch), 2 not-yet-available
+  ("The Star Loom", "Whispers Under the Roots").
+- **`TaleTrailsFlow.tsx`** — home → detail → player → Fireside →
+  reward → home, mirroring `MissionsFlow` exactly.
+- **`screens/TaleTrailsHomeScreen.tsx`** — discovery: one continuous
+  horizontal shelf of available + sealed episode cards, not two
+  separate zones.
+- **`components/EpisodeCard.tsx`** — sealed (not-yet-available)
+  chapters use the same card language as open ones, with a slow
+  Reanimated shimmer and in-world copy ("still gathering starlight")
+  instead of a generic greyed-out "Coming Soon" box. Tapping a sealed
+  card doesn't dead-end — it triggers a gentle Companion `Toast`.
+- **`screens/EpisodeDetailScreen.tsx`** — episode teaser + "Begin the
+  Trail" CTA, mirroring `MissionDetailScreen`'s layout.
+- **`screens/EpisodePlayerScreen.tsx`** — the branching orchestrator.
+  Opening beats play through the **existing, unmodified**
+  `StoryPlayer`; if the episode has a `choice`, a dedicated
+  `ChoicePrompt` screen (new, not a `StoryBeat`) pauses the story; the
+  chosen option plays one short reaction beat via the **existing,
+  unmodified** `StoryScene` (tap-to-continue, same as any beat); then
+  `closingBeats` play through a **second** `StoryPlayer` instance,
+  reconnecting to the identical ending regardless of choice. This is
+  the "lightweight branching, not a giant tree" the batch asked for,
+  and it means `StoryPlayer`/`StoryScene`/`StoryBeat` needed **zero
+  changes** — the stability the continuity doc (§11) requires for the
+  `StoryBeat` contract is intact.
+- **`components/ChoicePrompt.tsx`** — exactly two big, equally-weighted
+  options, no scoring, no "correct" framing.
+- **`screens/FiresideScreen.tsx`** — Companion reflects
+  conversationally on the episode. Explicitly NOT a "Moral of the
+  Story" and does not evaluate the child's choice — it's a feeling,
+  not a verdict (see each episode's `firesideLine` in the content
+  file for the tone).
+- **`screens/StoryRewardScreen.tsx`** — reuses the **existing**
+  `RewardBadge` component (same one Missions uses) for icon+amount
+  reward rows, rather than a parallel reward UI.
+- **Rewards** run through the exact same mechanism as Missions:
+  `progressionStore` (XP/coins/Adventure Tickets/Collector Tokens),
+  `companionStore.nudgeTrait`, a pushed `progressionStore` notification
+  (kind `"adventure"`), and a best-effort Supabase write — nothing
+  reward-related was reinvented for Stories.
+- **World transition**: Grove ↔ Tale Trails already used the shared
+  `path` variant from Batch 03's `transitionVariantFor` — no
+  navigation code needed to change at all.
+- **`worlds/worlds/TaleTrails.tsx`** now renders `TaleTrailsFlow`,
+  replacing the Batch 01/03 placeholder — same hand-off shape as
+  `worlds/worlds/Missions.tsx`.
+- **`state/storiesStore.ts`** — local-first per-episode status +
+  capped completion history, structurally identical to
+  `missionsStore.ts`.
+- **`services/supabase/stories.ts`** — reuses the **existing**
+  `story_progress` table from Batch 01's schema as-is (`chapter_index`
+  used as a 0/1 completion flag for now, since Batch 05 episodes are
+  single-session, not multi-chapter sagas). **No schema migration
+  needed for this batch.**
+- **Types** (`@apptypes`, additive): `StoryEpisodeDefinition`,
+  `StoryChoicePrompt`, `StoryChoiceOption`. Story rewards reuse the
+  existing `MissionReward` shape directly rather than a duplicate
+  `StoryReward` type.
+- 6 new placeholder-safe `AssetId`s (2 backgrounds per available
+  episode, 1 shared `STORY_SEALED_CHAPTER` art, 1 `FIRESIDE_BACKGROUND`).
+- New `@taletrails` path alias (`tsconfig.json` + `babel.config.js`),
+  mirroring the existing `@missions` alias.
+
+### Testing performed
+
+- `npm install` — clean, no new dependencies added.
+- `npx tsc --noEmit` — **0 errors**.
+- `npx expo export --platform android` — **full Metro bundle
+  succeeded**: 1296 modules compiled with no build errors (up from
+  1285 in Batch 04, confirming the new module is wired in and
+  compiles).
+- `npx expo-doctor` — 14/17, the same 3 sandbox-network-only failures
+  every prior batch has hit (blocked by this container's network
+  policy, not a project defect).
+- Traced the full episode step graph for both available episodes:
+  home → detail → player(opening) → choice → reaction → player
+  (closing) → Fireside → reward → home for "The Lantern Path"; the
+  same graph minus the choice/reaction steps for "Tide Cove Secrets"
+  (confirming an episode with no `choice` skips straight from opening
+  to closing beats correctly).
+- Confirmed sealed episode cards route to the Companion `Toast` tease
+  and never call `onSelectEpisode`.
+- Build artifacts (`dist/`, `.expo/`) removed before commit.
+
+### Explicitly deferred (per master protocol + Batch 05 instructions)
+
+- Real illustrated/audio assets for any of the 6 new AssetIds — all
+  resolve to the existing themed placeholder.
+- More than 2 available episodes — 2 sealed episodes exist to make the
+  discovery shelf feel like a real library, but only 2 are playable.
+- A branching model beyond one two-way choice per episode — matches
+  the explicit "do not create a giant branching tree" instruction.
+- Real per-profile identity for the Supabase write — still the
+  `"local-guest"` placeholder pending real auth→profile wiring (same
+  deferral as Missions).
+- Treasure Hunt, The Beyond, Parent Space, Store, AR, any second
+  visual theme, and any redesign of Grove/Missions — unchanged
+  deferral list; neither was touched in this batch.
+
+### Push status
+
+**Pushed to `main`** on explicit user approval ("continue and push it
+within claude limits").
+
+### Next batch (Batch 06) should
+
+- Read this file and `WONDERKIN_CONTINUITY.md` first.
+- Build out Treasure Hunt — Batch 03's `transitionVariantFor` already
+  reserves a `dissolve` transition for Grove → Treasure Hunt
+  ("environment transforms toward camera mode"), suggesting an
+  AR/camera-oriented interaction, distinct from both Missions' photo
+  flow and Tale Trails' cinematic player.
+- Consider whether a second submission type for Missions (voice is
+  the natural next one) or Treasure Hunt should come first — flag this
+  to the user rather than assuming, since both are reasonable reads of
+  "what's next."

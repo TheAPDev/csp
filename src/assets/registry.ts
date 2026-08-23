@@ -70,7 +70,14 @@ export type AssetId =
   | "ICON_MISSION"
   | "ICON_STORY"
   | "ICON_TREASURE"
-  | "ICON_SETTINGS";
+  | "ICON_SETTINGS"
+  // Tale Trails (Batch 05)
+  | "STORY_LANTERN_PATH_BG"
+  | "STORY_LANTERN_PATH_GLADE_BG"
+  | "STORY_TIDE_COVE_BG"
+  | "STORY_TIDE_COVE_DEPTHS_BG"
+  | "STORY_SEALED_CHAPTER"
+  | "FIRESIDE_BACKGROUND";
 
 export type AssetKind = "image" | "audio";
 
@@ -133,6 +140,14 @@ export const assetRegistry: Record<AssetId, AssetEntry> = {
   ICON_STORY: { kind: "image", source: null },
   ICON_TREASURE: { kind: "image", source: null },
   ICON_SETTINGS: { kind: "image", source: null },
+
+  // Tale Trails (Batch 05)
+  STORY_LANTERN_PATH_BG: { kind: "image", source: null },
+  STORY_LANTERN_PATH_GLADE_BG: { kind: "image", source: null },
+  STORY_TIDE_COVE_BG: { kind: "image", source: null },
+  STORY_TIDE_COVE_DEPTHS_BG: { kind: "image", source: null },
+  STORY_SEALED_CHAPTER: { kind: "image", source: null },
+  FIRESIDE_BACKGROUND: { kind: "image", source: null },
 };
 
 export function getAsset(id: AssetId): AssetEntry {

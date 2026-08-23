@@ -1,36 +1,19 @@
 import React from "react";
-import { Text, StyleSheet, SafeAreaView } from "react-native";
-import { WorldScene } from "@worlds/WorldScene";
-import { worldRegistry, WorldId } from "@worlds/WorldRegistry";
-import { typography, colors, spacing } from "@theme";
-import { ReturnToGrove } from "@components/index";
+import { WorldId } from "@worlds/WorldRegistry";
+import { TaleTrailsFlow } from "@taletrails/TaleTrailsFlow";
 
 interface TaleTrailsWorldProps {
   onNavigateToWorld?: (world: WorldId) => void;
 }
 
 /**
- * Placeholder World screen for "TaleTrails". Scaffolding only — full
- * gameplay for this World is out of scope for Batch 03 per the
- * master rule (DO NOT implement full Missions/Stories/AR/Store).
- * Reachable only via its Grove gateway (see WorldGateway) — the
- * bottom tab bar no longer switches between the five main Worlds.
+ * Tale Trails World entry point (Batch 05). Renders the full Tale
+ * Trails system via `TaleTrailsFlow` — reachable only through its
+ * Grove gateway, same as every other World (see WorldGateway /
+ * RootNavigator). The discovery screen's own "Return to the Grove"
+ * link is the way home, same `ReturnToGrove` affordance every other
+ * World uses.
  */
 export default function TaleTrailsWorld({ onNavigateToWorld }: TaleTrailsWorldProps) {
-  const def = worldRegistry.taleTrails;
-  return (
-    <WorldScene backgroundAssetId={def.backgroundAssetId}>
-      <SafeAreaView style={styles.safeArea}>
-        <Text style={styles.title}>{def.displayName}</Text>
-        <Text style={styles.subtitle}>Coming in a future batch.</Text>
-        <ReturnToGrove onPress={() => onNavigateToWorld?.("grove")} />
-      </SafeAreaView>
-    </WorldScene>
-  );
+  return <TaleTrailsFlow onReturnToGrove={() => onNavigateToWorld?.("grove")} />;
 }
-
-const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
-  title: { ...typography.title, color: colors.text.primary, margin: spacing.xl },
-  subtitle: { ...typography.body, color: colors.text.secondary, marginHorizontal: spacing.xl },
-});
