@@ -149,17 +149,17 @@ interface AssetEntry {
 // entries must use literal require("./images/x.png") calls when added.
 export const assetRegistry: Record<AssetId, AssetEntry> = {
   COMPANION_IDLE: { kind: "image", source: require("./images/companion-idle.png") },
-  COMPANION_HAPPY: { kind: "image", source: null },
-  COMPANION_CURIOUS: { kind: "image", source: null },
-  COMPANION_SLEEPY: { kind: "image", source: null },
-  COMPANION_CELEBRATING: { kind: "image", source: null },
-  COMPANION_THINKING: { kind: "image", source: null },
-  COMPANION_ENCOURAGING: { kind: "image", source: null },
-  COMPANION_QUEST_REACTION: { kind: "image", source: null },
-  COMPANION_STORY_REACTION: { kind: "image", source: null },
-  COMPANION_REWARD_REACTION: { kind: "image", source: null },
-  COMPANION_INTERACTION: { kind: "image", source: null },
-  COMPANION_REFLECTIVE: { kind: "image", source: null },
+  COMPANION_HAPPY: { kind: "image", source: require("./images/companion-idle.png") },
+  COMPANION_CURIOUS: { kind: "image", source: require("./images/companion-idle.png") },
+  COMPANION_SLEEPY: { kind: "image", source: require("./images/companion-idle.png") },
+  COMPANION_CELEBRATING: { kind: "image", source: require("./images/companion-idle.png") },
+  COMPANION_THINKING: { kind: "image", source: require("./images/companion-idle.png") },
+  COMPANION_ENCOURAGING: { kind: "image", source: require("./images/companion-idle.png") },
+  COMPANION_QUEST_REACTION: { kind: "image", source: require("./images/companion-idle.png") },
+  COMPANION_STORY_REACTION: { kind: "image", source: require("./images/companion-idle.png") },
+  COMPANION_REWARD_REACTION: { kind: "image", source: require("./images/companion-idle.png") },
+  COMPANION_INTERACTION: { kind: "image", source: require("./images/companion-idle.png") },
+  COMPANION_REFLECTIVE: { kind: "image", source: require("./images/companion-idle.png") },
   GROVE_DECOR_EMBER_1: { kind: "image", source: null },
   GROVE_DECOR_EMBER_2: { kind: "image", source: null },
   GROVE_DECOR_TIDE_1: { kind: "image", source: null },
@@ -179,9 +179,9 @@ export const assetRegistry: Record<AssetId, AssetEntry> = {
 
   ONBOARDING_WELCOME_BACKGROUND: { kind: "image", source: null },
   ONBOARDING_STORY_BACKGROUND: { kind: "image", source: null },
-  // Local onboarding loop video. Replace the placeholder file
-  // at src/assets/videos/onboarding_loop.mp4 with your real MP4.
-  ONBOARDING_STORY_VIDEO: { kind: "video", source: require("./videos/onboarding_loop.mp4") },
+  // Local onboarding loop video. Re-encoded to a simpler MP4 profile for
+  // better compatibility with Expo AV while preserving the intended loop.
+  ONBOARDING_STORY_VIDEO: { kind: "video", source: require("./videos/onboarding_loop_safe.mp4") },
 
   // Missions (Batch 04) — one card art per category, shared across
   // that category's missions until real per-mission art is supplied.
