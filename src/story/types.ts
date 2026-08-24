@@ -12,6 +12,7 @@ export type BeatHaptic = "light" | "medium" | "success" | "none";
 export interface StoryBeat {
   id: string;
   backgroundAssetId: AssetId;
+  videoAssetId?: AssetId;
   speaker?: string;
   line?: string;
   cameraEffect?: CameraEffect;

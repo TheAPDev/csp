@@ -1,5 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, typography, spacing, radius } from "@theme";
 import { AssetImage } from "./AssetImage";
 import { AssetId } from "@assets/registry";
@@ -9,7 +10,7 @@ interface StatusControlProps {
   value: string | number;
 }
 
-/** Compact HUD readout — e.g. XP, currency. Kept low-numeric per Child UX rules. */
+/** Compact HUD readout â€” e.g. XP, currency. Kept low-numeric per Child UX rules. */
 export function StatusControl({ iconAssetId, value }: StatusControlProps) {
   return (
     <View style={styles.wrap}>
@@ -32,3 +33,4 @@ const styles = StyleSheet.create({
   icon: { width: 20, height: 20, borderRadius: radius.sm },
   value: { ...typography.label, color: colors.text.primary },
 });
+

@@ -53,6 +53,7 @@ export type AssetId =
   // First-time onboarding (Batch 02)
   | "ONBOARDING_WELCOME_BACKGROUND"
   | "ONBOARDING_STORY_BACKGROUND"
+  | "ONBOARDING_STORY_VIDEO"
   // Grove environmental evolution stages (Batch 03) — background varies
   // with progression; business logic never hardcodes which stage looks
   // like what, it only picks the AssetId via groveStore.
@@ -136,18 +137,18 @@ export type AssetId =
   | "BEYOND_REGION_FAR_SHORE"
   | "BEYOND_REGION_EMBER_HOLLOW";
 
-export type AssetKind = "image" | "audio";
+export type AssetKind = "image" | "audio" | "video";
 
 interface AssetEntry {
   kind: AssetKind;
-  /** Local require() source. null until real art/audio is supplied. */
-  source: number | null;
+  /** Local require() source or remote asset URI. null until a real asset is supplied. */
+  source: number | { uri: string } | null;
 }
 
 // NOTE: React Native require() must be statically analyzable, so real
 // entries must use literal require("./images/x.png") calls when added.
 export const assetRegistry: Record<AssetId, AssetEntry> = {
-  COMPANION_IDLE: { kind: "image", source: null },
+  COMPANION_IDLE: { kind: "image", source: require("./images/companion-idle.png") },
   COMPANION_HAPPY: { kind: "image", source: null },
   COMPANION_CURIOUS: { kind: "image", source: null },
   COMPANION_SLEEPY: { kind: "image", source: null },
@@ -178,6 +179,9 @@ export const assetRegistry: Record<AssetId, AssetEntry> = {
 
   ONBOARDING_WELCOME_BACKGROUND: { kind: "image", source: null },
   ONBOARDING_STORY_BACKGROUND: { kind: "image", source: null },
+  // Local onboarding loop video. Replace the placeholder file
+  // at src/assets/videos/onboarding_loop.mp4 with your real MP4.
+  ONBOARDING_STORY_VIDEO: { kind: "video", source: require("./videos/onboarding_loop.mp4") },
 
   // Missions (Batch 04) — one card art per category, shared across
   // that category's missions until real per-mission art is supplied.

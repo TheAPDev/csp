@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { colors, typography, spacing } from "@theme";
 import { ParticleField, ParticleTone } from "@story/index";
@@ -11,18 +12,18 @@ const VARIANT_CONFIG: Record<
   CelebrationVariant,
   { tone: ParticleTone; count: number; mood: CompanionMood; haptic: Haptics.ImpactFeedbackStyle }
 > = {
-  // Frequent Coin/cosmetic buys — light, quick, low-ceremony.
+  // Frequent Coin/cosmetic buys â€” light, quick, low-ceremony.
   purchase: { tone: "secondary", count: 8, mood: "happy", haptic: Haptics.ImpactFeedbackStyle.Light },
-  // Reaching a Vault milestone — bigger, warmer, more ceremony (rare currency, prestige feel).
+  // Reaching a Vault milestone â€” bigger, warmer, more ceremony (rare currency, prestige feel).
   vaultProgress: { tone: "caution", count: 16, mood: "curious", haptic: Haptics.ImpactFeedbackStyle.Medium },
-  // A completed physical-reward redemption request — the biggest moment in the economy.
+  // A completed physical-reward redemption request â€” the biggest moment in the economy.
   redemption: { tone: "positive", count: 22, mood: "celebrating", haptic: Haptics.ImpactFeedbackStyle.Heavy },
 };
 
 interface RewardCelebrationProps {
   visible: boolean;
   variant: CelebrationVariant;
-  /** Short child-facing line — varies per specific reward, not one generic phrase. */
+  /** Short child-facing line â€” varies per specific reward, not one generic phrase. */
   line: string;
   onDone?: () => void;
 }
@@ -32,7 +33,7 @@ interface RewardCelebrationProps {
  * REWARD ANIMATION rule ("do not use the same celebration for every
  * reward"). Reuses `ParticleField` (extended in Batch 07 with a
  * `tone` prop) and `CompanionReaction` rather than inventing a new
- * animation system — only the tone, particle count, Companion mood,
+ * animation system â€” only the tone, particle count, Companion mood,
  * and haptic weight vary per variant.
  */
 export function RewardCelebration({ visible, variant, line, onDone }: RewardCelebrationProps) {
@@ -69,3 +70,4 @@ const styles = StyleSheet.create({
   center: { alignItems: "center", justifyContent: "center" },
   line: { ...typography.body, color: colors.text.primary, textAlign: "center", paddingHorizontal: spacing.xl },
 });
+

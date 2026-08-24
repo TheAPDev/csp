@@ -1,5 +1,6 @@
-import React, { useRef, useState } from "react";
+﻿import React, { useRef, useState } from "react";
 import { View, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { WorldTransition } from "@components/index";
 import { WorldId } from "@worlds/WorldRegistry";
 import { transitionVariantFor } from "@navigation/transitionVariant";
@@ -26,11 +27,11 @@ const worldComponents: Record<WorldId, React.ComponentType<{ onNavigateToWorld?:
  * Root navigation shell. Batch 03 replaces the generic tab-bar
  * world-switcher with gateway-based spatial navigation: the Grove
  * renders `WorldGateway` portals, and every other World renders a
- * `ReturnToGrove` affordance — both call back into this component's
+ * `ReturnToGrove` affordance â€” both call back into this component's
  * `navigateToWorld`, which picks a cinematic transition variant per
  * route (see `transitionVariant.ts`) instead of one arbitrary slide
  * for every swap. World components stay registered the same way as
- * Batch 01 — a future World only needs registering, not new nav
+ * Batch 01 â€” a future World only needs registering, not new nav
  * plumbing.
  */
 export function RootNavigator() {
@@ -48,7 +49,7 @@ export function RootNavigator() {
     setTransitioning(true);
     // Swap the active World at the transition's midpoint (overlay at
     // full coverage), the same swap-mid-fade pattern the onboarding
-    // hand-off into the Grove uses — see WONDERKIN_CONTINUITY §13.
+    // hand-off into the Grove uses â€” see WONDERKIN_CONTINUITY Â§13.
     setTimeout(() => {
       if (pendingWorld.current) {
         setActive(pendingWorld.current);
@@ -75,3 +76,4 @@ const styles = StyleSheet.create({
   root: { flex: 1 },
   content: { flex: 1 },
 });
+

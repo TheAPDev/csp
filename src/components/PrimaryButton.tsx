@@ -1,5 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { Pressable, Text, StyleSheet, ViewStyle, StyleProp, GestureResponderEvent } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { colors, typography, spacing, radius, touchTarget, opacity } from "@theme";
 
@@ -49,3 +50,4 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
   },
 });
+

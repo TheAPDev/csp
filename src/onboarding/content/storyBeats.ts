@@ -5,6 +5,7 @@ export const introStoryBeats: StoryBeat[] = [
   {
     id: "beat-dreaming",
     backgroundAssetId: "ONBOARDING_STORY_BACKGROUND",
+    videoAssetId: "ONBOARDING_STORY_VIDEO",
     cameraEffect: "drift",
     speaker: "Narrator",
     line: "Long before you arrived, WONDERKIN was already dreaming.",
@@ -13,6 +14,7 @@ export const introStoryBeats: StoryBeat[] = [
   {
     id: "beat-eggs",
     backgroundAssetId: "ONBOARDING_STORY_BACKGROUND",
+    videoAssetId: "ONBOARDING_STORY_VIDEO",
     cameraEffect: "push",
     speaker: "Narrator",
     line: "Somewhere past the last lantern light, three eggs waited for someone to find them.",
@@ -22,6 +24,7 @@ export const introStoryBeats: StoryBeat[] = [
   {
     id: "beat-you",
     backgroundAssetId: "ONBOARDING_STORY_BACKGROUND",
+    videoAssetId: "ONBOARDING_STORY_VIDEO",
     cameraEffect: "pull",
     speaker: "Narrator",
     line: "Tonight, that someone is you.",

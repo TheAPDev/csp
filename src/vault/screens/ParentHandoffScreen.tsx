@@ -1,5 +1,6 @@
-import React from "react";
-import { View, Text, SafeAreaView, StyleSheet } from "react-native";
+﻿import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, typography, spacing } from "@theme";
 import { PrimaryButton } from "@components/PrimaryButton";
 import { RewardCelebration } from "@components/RewardCelebration";
@@ -13,7 +14,7 @@ interface ParentHandoffScreenProps {
 /**
  * Redemption confirmation, per Batch 07 spec ("parent handoff
  * placeholder"). This is explicitly a placeholder: no payment or
- * shipping information is collected from the child anywhere here —
+ * shipping information is collected from the child anywhere here â€”
  * it just tells the child a grown-up will take it from here, and logs
  * the request (see `vaultStore.requestRedemption`) for a future
  * Parent Space batch to surface and fulfill.
@@ -28,7 +29,7 @@ export function ParentHandoffScreen({ reward, onDone }: ParentHandoffScreenProps
           line={`${reward.name} is on its way! Ask a grown-up to check the request.`}
         />
         <Text style={styles.note}>
-          No information is needed from you — a grown-up will see this request and take care
+          No information is needed from you â€” a grown-up will see this request and take care
           of the rest.
         </Text>
         <PrimaryButton label="Back to the Vault" onPress={onDone} style={styles.cta} />
@@ -43,3 +44,4 @@ const styles = StyleSheet.create({
   note: { ...typography.body, color: colors.text.secondary, textAlign: "center" },
   cta: { alignSelf: "stretch" },
 });
+

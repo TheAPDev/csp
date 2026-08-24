@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
-import { View, Text, SafeAreaView, StyleSheet } from "react-native";
+﻿import React, { useEffect } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { WorldScene } from "@worlds/WorldScene";
 import { CompanionReaction } from "@components/CompanionReaction";
 import { Dialogue } from "@components/Dialogue";
@@ -16,11 +17,11 @@ interface FiresideScreenProps {
 }
 
 /**
- * Companion Fireside — the episode's emotional close. This is a
+ * Companion Fireside â€” the episode's emotional close. This is a
  * reflection, not a report card: no "Moral of the story", no grading
  * of the child's choice. Just the Companion thinking out loud, the
  * same way a friend would after an adventure. Uses the dedicated
- * "reflective" mood (Batch 08) rather than reusing "celebrating" —
+ * "reflective" mood (Batch 08) rather than reusing "celebrating" â€”
  * Fireside is quiet, not a reward beat (the reward screen that
  * follows already handles celebration).
  */
@@ -55,3 +56,4 @@ const styles = StyleSheet.create({
   dialogueWrap: { width: "100%", marginBottom: spacing.lg },
   cta: { alignSelf: "stretch" },
 });
+

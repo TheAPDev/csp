@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { colors, typography, spacing, radius, touchTarget, shadows } from "@theme";
 import { IconButton } from "./IconButton";
@@ -109,3 +110,4 @@ const styles = StyleSheet.create({
   },
   notificationText: { ...typography.body, color: colors.text.primary },
 });
+

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { View, Text, ScrollView, Pressable, SafeAreaView, StyleSheet } from "react-native";
+﻿import React, { useState } from "react";
+import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { colors, typography, spacing, radius } from "@theme";
 import { StatusControl } from "@components/StatusControl";
@@ -20,7 +21,7 @@ interface ClosetHomeScreenProps {
 
 /**
  * Store entry + categories, per Batch 07 spec. One primary action per
- * screen (browse → tap an item) — purchase itself happens on the
+ * screen (browse â†’ tap an item) â€” purchase itself happens on the
  * preview screen, never directly from this grid, so a stray tap can
  * never spend currency by accident.
  */
@@ -102,3 +103,4 @@ const styles = StyleSheet.create({
   tabLabelActive: { color: colors.text.inverse },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: spacing.md },
 });
+

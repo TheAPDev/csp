@@ -1,68 +1,55 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { PrimaryButton } from "@components/PrimaryButton";
 import { SecondaryButton } from "@components/SecondaryButton";
 import { Toast } from "@components/Toast";
 import { LoadingIndicator } from "@components/LoadingIndicator";
 import { colors, typography, spacing, radius } from "@theme";
 import { useOnboardingStore } from "@state/onboardingStore";
-import { signUpWithEmail, signInWithEmail } from "@services/supabase/auth";
 
 type Mode = "create" | "signIn";
 
 /**
- * Account entry. Always falls forward — if Supabase isn't configured
- * yet, or the network call fails, the child can still continue as a
- * guest rather than hitting a dead end (a parent can link the account
- * later from Parent Space, a future batch).
+ * First-run entry. For now, any username/password works and the user can
+ * continue immediately. This keeps the app moving while preserving the exact
+ * welcome-to-story flow for the first-time experience.
  */
 export function AccountEntryScreen() {
   const advance = useOnboardingStore((s) => s.advance);
   const [mode, setMode] = useState<Mode>("create");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState("");
 
-  async function handleSubmit() {
-    if (!email || !password) {
-      setToast("A parent or grown-up can fill this in together.");
+  function handleSubmit() {
+    if (!username.trim() || !password.trim()) {
+      setToast("Enter any username and password to continue.");
       return;
     }
+
     setBusy(true);
-    try {
-      const { error } =
-        mode === "create"
-          ? await signUpWithEmail(email, password)
-          : await signInWithEmail(email, password);
+    setTimeout(() => {
       setBusy(false);
-      if (error) {
-        setToast(error.message);
-        return;
-      }
       advance();
-    } catch {
-      setBusy(false);
-      setToast("Couldn't reach the server — continuing as a guest for now.");
-      advance();
-    }
+    }, 250);
   }
 
   if (busy) return <LoadingIndicator />;
 
   return (
     <View style={styles.root}>
-      <Text style={styles.title}>{mode === "create" ? "Create a family account" : "Welcome back"}</Text>
-      <Text style={styles.subtitle}>A grown-up's email keeps progress safe.</Text>
+      <Text style={styles.title}>{mode === "create" ? "Create your account" : "Welcome back"}</Text>
+      <Text style={styles.subtitle}>For now, any username and password will work.</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Email"
+        placeholder="Username"
         placeholderTextColor={colors.text.disabled}
         autoCapitalize="none"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
+        value={username}
+        onChangeText={setUsername}
       />
       <TextInput
         style={styles.input}
@@ -74,7 +61,7 @@ export function AccountEntryScreen() {
       />
 
       <PrimaryButton
-        label={mode === "create" ? "Create Account" : "Sign In"}
+        label={mode === "create" ? "Continue" : "Sign In"}
         onPress={handleSubmit}
         style={styles.cta}
       />
@@ -108,3 +95,4 @@ const styles = StyleSheet.create({
   cta: { marginTop: spacing.sm },
   secondaryCta: { marginTop: spacing.md },
 });
+

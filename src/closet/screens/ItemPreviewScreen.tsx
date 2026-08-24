@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { View, Text, SafeAreaView, StyleSheet } from "react-native";
+﻿import React, { useState } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, typography, spacing } from "@theme";
 import { AssetImage } from "@components/AssetImage";
 import { PrimaryButton } from "@components/PrimaryButton";
@@ -27,7 +28,7 @@ interface ItemPreviewScreenProps {
 /**
  * Item preview + purchase + equip, per Batch 07 spec. One clear
  * primary action at a time: Buy (if unowned), then Equip (once
- * owned) — never both buttons offering the same weight at once.
+ * owned) â€” never both buttons offering the same weight at once.
  */
 export function ItemPreviewScreen({ item, owned, equipped, onPurchase, onEquip, onBack }: ItemPreviewScreenProps) {
   const [celebrating, setCelebrating] = useState(false);
@@ -40,7 +41,7 @@ export function ItemPreviewScreen({ item, owned, equipped, onPurchase, onEquip, 
       setJustPurchased(true);
       setCelebrating(true);
     } else if (outcome === "insufficient_currency") {
-      setToast(`Not enough ${CURRENCY_LABEL[item.currency]} yet — keep exploring!`);
+      setToast(`Not enough ${CURRENCY_LABEL[item.currency]} yet â€” keep exploring!`);
     } else if (outcome === "already_owned") {
       setJustPurchased(true);
     }
@@ -99,3 +100,4 @@ const styles = StyleSheet.create({
   equippedLabel: { ...typography.label, color: colors.accent.secondary },
   cta: { alignSelf: "stretch", marginTop: spacing.sm },
 });
+

@@ -1,5 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { View, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, radius, duration } from "@theme";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { useEffect } from "react";
@@ -9,7 +10,7 @@ interface ProgressBarProps {
   height?: number;
 }
 
-/** Non-anxiety progress indicator — no numeric grading, just visual fill. */
+/** Non-anxiety progress indicator â€” no numeric grading, just visual fill. */
 export function ProgressBar({ progress, height = 12 }: ProgressBarProps) {
   const width = useSharedValue(0);
 
@@ -39,3 +40,4 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent.secondary,
   },
 });
+

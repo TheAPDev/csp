@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Pressable, View, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { StoryScene } from "./StoryScene";
 import { StoryBeat } from "./types";
@@ -17,7 +18,7 @@ const hapticMap = {
 
 /**
  * Plays a sequence of StoryBeats end-to-end. Tap-to-advance is the
- * primary interaction — progression never depends solely on an
+ * primary interaction â€” progression never depends solely on an
  * animation finishing, so an interrupted or slow-to-render beat can
  * never soft-lock the child (Batch 02 "interrupted animation" case).
  * Reusable as-is for any future story sequence (Batch 05 Tale Trails).
@@ -74,3 +75,4 @@ const styles = StyleSheet.create({
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: "rgba(245,240,230,0.28)" },
   dotActive: { backgroundColor: "rgba(245,240,230,0.9)" },
 });
+

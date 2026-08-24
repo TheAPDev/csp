@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+﻿import React, { useEffect } from "react";
 import { View, Text, Pressable, StyleSheet, ImageStyle } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing } from "react-native-reanimated";
 import { AssetImage } from "@components/AssetImage";
@@ -11,13 +12,13 @@ interface EpisodeCardProps {
   episode: StoryEpisodeDefinition;
   status: EpisodeStatus;
   onPress: () => void;
-  /** Called instead of `onPress` when the chapter isn't open yet — a gentle Companion tease, never a dead tap. */
+  /** Called instead of `onPress` when the chapter isn't open yet â€” a gentle Companion tease, never a dead tap. */
   onSealedPress: () => void;
 }
 
 /**
  * Available chapters look like any other card. Not-yet-available
- * chapters are NOT a generic greyed-out "Coming Soon" box — they use
+ * chapters are NOT a generic greyed-out "Coming Soon" box â€” they use
  * the same card language with a slow shimmer and in-world sealed
  * framing, so the library still feels alive and complete.
  */
@@ -56,9 +57,9 @@ export function EpisodeCard({ episode, status, onPress, onSealedPress }: Episode
           {episode.title}
         </Text>
         <Text style={styles.teaser} numberOfLines={2}>
-          {episode.available ? episode.teaser : "This trail hasn't opened yet — it's still gathering starlight."}
+          {episode.available ? episode.teaser : "This trail hasn't opened yet â€” it's still gathering starlight."}
         </Text>
-        {status === "complete" && episode.available && <Text style={styles.doneBadge}>Told ✓</Text>}
+        {status === "complete" && episode.available && <Text style={styles.doneBadge}>Told âœ“</Text>}
       </View>
     </Pressable>
   );
@@ -85,3 +86,4 @@ const styles = StyleSheet.create({
   teaser: { ...typography.caption, color: colors.text.secondary, marginTop: spacing.xxs, minHeight: 30 },
   doneBadge: { ...typography.caption, color: colors.accent.primary, marginTop: spacing.xxs },
 });
+

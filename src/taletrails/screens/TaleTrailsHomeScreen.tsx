@@ -1,5 +1,6 @@
-import React from "react";
-import { View, Text, ScrollView, SafeAreaView, StyleSheet } from "react-native";
+﻿import React from "react";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, typography, spacing } from "@theme";
 import { StoryEpisodeDefinition } from "@apptypes";
 import { storyEpisodes } from "../content/storyDefinitions";
@@ -13,7 +14,7 @@ interface TaleTrailsHomeScreenProps {
   onReturnToGrove: () => void;
 }
 
-/** Discovery: available chapters first, sealed chapters after — the library reads as one continuous shelf, not two separate zones. */
+/** Discovery: available chapters first, sealed chapters after â€” the library reads as one continuous shelf, not two separate zones. */
 export function TaleTrailsHomeScreen({ onSelectEpisode, onSealedTease, onReturnToGrove }: TaleTrailsHomeScreenProps) {
   const statusFor = useStoriesStore((s) => s.statusFor);
   const available = storyEpisodes.filter((e) => e.available);
@@ -23,7 +24,7 @@ export function TaleTrailsHomeScreen({ onSelectEpisode, onSealedTease, onReturnT
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Tale Trails</Text>
-        <Text style={styles.subtitle}>Pick a trail — your Companion will come along.</Text>
+        <Text style={styles.subtitle}>Pick a trail â€” your Companion will come along.</Text>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
           {[...available, ...sealed].map((episode) => (
@@ -56,3 +57,4 @@ const styles = StyleSheet.create({
   },
   row: { gap: spacing.md, paddingHorizontal: spacing.lg },
 });
+

@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+﻿import React, { useEffect } from "react";
 import { StyleSheet, Dimensions } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -18,7 +19,7 @@ interface WorldTransitionProps {
    * Which visual language this swap uses. Defaults to "fade" to stay
    * backward compatible with earlier batches (e.g. the onboarding
    * hand-off into the Grove). Batch 03 world-switching picks a
-   * variant per route — see navigation/transitionVariant.ts — instead
+   * variant per route â€” see navigation/transitionVariant.ts â€” instead
    * of one arbitrary slide for everything.
    */
   variant?: WorldTransitionVariant;
@@ -29,7 +30,7 @@ const DIAGONAL = Math.sqrt(width * width + height * height);
 
 /**
  * Full-screen overlay used while swapping World scenes. This is the
- * visual anchor for the transition primitives in /src/transitions —
+ * visual anchor for the transition primitives in /src/transitions â€”
  * those primitives drive `progress`; this component renders it as one
  * of a few distinct cinematic languages rather than an arbitrary
  * slide, per the master protocol's transition rules.
@@ -119,3 +120,4 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.primary,
   },
 });
+

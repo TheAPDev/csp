@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "@theme";
 import { WorldScene } from "@worlds/WorldScene";
 import { MissionDefinition } from "@apptypes";
@@ -29,10 +30,10 @@ interface MissionsFlowProps {
 }
 
 /**
- * Orchestrates the full Missions journey: entry → detail → (photo)
- * camera → preview → verification → reward → back to entry. Mirrors
+ * Orchestrates the full Missions journey: entry â†’ detail â†’ (photo)
+ * camera â†’ preview â†’ verification â†’ reward â†’ back to entry. Mirrors
  * OnboardingFlow's single-owner-of-sequencing pattern. Session state
- * only — an in-progress submission doesn't need to survive an app
+ * only â€” an in-progress submission doesn't need to survive an app
  * kill the way onboarding's identity-forming choices do.
  */
 export function MissionsFlow({ onReturnToGrove }: MissionsFlowProps) {
@@ -57,7 +58,7 @@ export function MissionsFlow({ onReturnToGrove }: MissionsFlowProps) {
       traitLean: mission.traitLean,
       notification: { kind: "reward", message: `${mission.title} complete!` },
     });
-    // Best-effort Supabase sync — never blocks the local reward flow.
+    // Best-effort Supabase sync â€” never blocks the local reward flow.
     recordMissionCompletion("local-guest", mission.id, reward);
   }
 
@@ -147,3 +148,4 @@ export function MissionsFlow({ onReturnToGrove }: MissionsFlowProps) {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background.primary },
 });
+

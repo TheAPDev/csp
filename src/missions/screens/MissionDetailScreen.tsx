@@ -1,5 +1,6 @@
-import React from "react";
-import { View, Text, ScrollView, SafeAreaView, StyleSheet, ImageStyle } from "react-native";
+﻿import React from "react";
+import { View, Text, ScrollView, StyleSheet, ImageStyle } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { AssetImage } from "@components/AssetImage";
 import { PrimaryButton } from "@components/PrimaryButton";
 import { IconButton } from "@components/IconButton";
@@ -31,7 +32,7 @@ export function MissionDetailScreen({ mission, onStart, onBack }: MissionDetailS
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content}>
         <IconButton onPress={onBack} style={styles.back}>
-          <Text style={styles.backLabel}>←</Text>
+          <Text style={styles.backLabel}>â†</Text>
         </IconButton>
         <AssetImage id={categoryAsset[mission.category]} style={styles.hero as ImageStyle} />
         <Text style={styles.category}>{categoryLabel[mission.category]}</Text>
@@ -46,7 +47,7 @@ export function MissionDetailScreen({ mission, onStart, onBack }: MissionDetailS
           <PrimaryButton label="Start Mission" onPress={onStart} style={styles.cta} />
         ) : (
           <Text style={styles.notReady}>
-            This kind of quest is still waking up — try a photo quest for now!
+            This kind of quest is still waking up â€” try a photo quest for now!
           </Text>
         )}
       </ScrollView>
@@ -77,3 +78,4 @@ const styles = StyleSheet.create({
   cta: { alignSelf: "stretch" },
   notReady: { ...typography.body, color: colors.text.secondary, textAlign: "center" },
 });
+

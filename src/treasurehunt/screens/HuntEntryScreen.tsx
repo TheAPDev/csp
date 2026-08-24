@@ -1,5 +1,6 @@
-import React from "react";
-import { View, Text, StyleSheet, SafeAreaView } from "react-native";
+﻿import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { CompanionReaction } from "@components/CompanionReaction";
 import { PrimaryButton } from "@components/PrimaryButton";
 import { ReturnToGrove } from "@components/ReturnToGrove";
@@ -12,9 +13,9 @@ interface HuntEntryScreenProps {
 }
 
 /**
- * Hunt entry — establishes the moment before the camera opens, same
+ * Hunt entry â€” establishes the moment before the camera opens, same
  * role `MissionDetailScreen` plays before Missions' camera step. One
- * primary action per Child UX Rule §1.
+ * primary action per Child UX Rule Â§1.
  */
 export function HuntEntryScreen({ onStart, onReturnToGrove }: HuntEntryScreenProps) {
   const companionName = useCompanionStore((s) => s.name);
@@ -48,3 +49,4 @@ const styles = StyleSheet.create({
   },
   cta: { alignSelf: "stretch" },
 });
+

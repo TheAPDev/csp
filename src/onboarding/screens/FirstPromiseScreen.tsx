@@ -1,5 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { colors, typography, spacing, radius, shadows } from "@theme";
 import { useOnboardingStore } from "@state/onboardingStore";
@@ -8,7 +9,7 @@ import { firstPromiseOptions, PromiseOption } from "../content/promises";
 import { CompanionTraits } from "@apptypes";
 
 /**
- * The First Promise — an emotionally meaningful choice, not a
+ * The First Promise â€” an emotionally meaningful choice, not a
  * tutorial checkbox. Whichever line the child picks becomes a quiet
  * internal lean on the Companion; it is never scored or shown.
  */
@@ -64,3 +65,4 @@ const styles = StyleSheet.create({
   pressed: { opacity: 0.8 },
   optionText: { ...typography.body, color: colors.text.primary, textAlign: "center" },
 });
+

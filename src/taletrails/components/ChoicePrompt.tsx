@@ -1,5 +1,6 @@
-import React from "react";
-import { View, Text, Pressable, StyleSheet, SafeAreaView } from "react-native";
+﻿import React from "react";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { AssetImage } from "@components/AssetImage";
 import { colors, typography, spacing, radius, shadows } from "@theme";
@@ -13,7 +14,7 @@ interface ChoicePromptProps {
 
 /**
  * The one branching moment in an episode. Deliberately just two big,
- * equally-weighted options — no scoring, no "correct" choice framing.
+ * equally-weighted options â€” no scoring, no "correct" choice framing.
  */
 export function ChoicePrompt({ prompt, companionName, onChoose }: ChoicePromptProps) {
   return (
@@ -75,3 +76,4 @@ const styles = StyleSheet.create({
   optionPressed: { opacity: 0.85 },
   optionLabel: { ...typography.heading, color: colors.text.primary, textAlign: "center" },
 });
+

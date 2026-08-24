@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { CompanionReaction } from "@components/CompanionReaction";
 import { PrimaryButton } from "@components/PrimaryButton";
 import { colors, typography, spacing, radius } from "@theme";
 import { useOnboardingStore } from "@state/onboardingStore";
 import { useCompanionStore } from "@state/companionStore";
 
-/** A beautiful, simple naming moment — the Companion's name persists from here on. */
+/** A beautiful, simple naming moment â€” the Companion's name persists from here on. */
 export function NamingScreen() {
   const advance = useOnboardingStore((s) => s.advance);
   const setOnboardingName = useOnboardingStore((s) => s.setCompanionName);
@@ -57,3 +58,4 @@ const styles = StyleSheet.create({
   },
   cta: { alignSelf: "stretch" },
 });
+

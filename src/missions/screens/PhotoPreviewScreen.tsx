@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { View, Text, Image, StyleSheet, SafeAreaView } from "react-native";
+﻿import React, { useState } from "react";
+import { View, Text, Image, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { PrimaryButton } from "@components/PrimaryButton";
 import { SecondaryButton } from "@components/SecondaryButton";
 import { LoadingIndicator } from "@components/LoadingIndicator";
@@ -14,7 +15,7 @@ interface PhotoPreviewScreenProps {
 }
 
 /**
- * Preview + submit. Owns upload failure / network failure handling —
+ * Preview + submit. Owns upload failure / network failure handling â€”
  * a failed "upload" (simulated for now, see submissionUpload.ts)
  * offers a clear retry or a way back to preview, never a dead end.
  */
@@ -43,7 +44,7 @@ export function PhotoPreviewScreen({ photoUri, onRetake, onUploaded, onCancel }:
         <Image source={{ uri: photoUri }} style={styles.preview} />
 
         {uploadFailed && (
-          <Text style={styles.errorText}>That didn't quite send — want to try again?</Text>
+          <Text style={styles.errorText}>That didn't quite send â€” want to try again?</Text>
         )}
 
         <PrimaryButton label={uploadFailed ? "Try Again" : "Submit"} onPress={handleSubmit} style={styles.cta} />
@@ -62,3 +63,4 @@ const styles = StyleSheet.create({
   errorText: { ...typography.body, color: colors.feedback.danger, textAlign: "center", marginBottom: spacing.md },
   cta: { alignSelf: "stretch" },
 });
+

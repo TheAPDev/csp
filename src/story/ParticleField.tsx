@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
+﻿import React, { useEffect } from "react";
 import { StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanimated";
 import { colors } from "@theme";
 import { particleTransition } from "@transitions";
 
-/** Which accent tone the particles render in — see Batch 07 note below. */
+/** Which accent tone the particles render in â€” see Batch 07 note below. */
 export type ParticleTone = "secondary" | "positive" | "caution";
 
 const toneColor: Record<ParticleTone, string> = {
@@ -19,7 +20,7 @@ interface ParticleFieldProps {
   /**
    * Added in Batch 07 so the economy's reward celebrations (coin vs.
    * ticket vs. token) can each feel distinct without introducing a
-   * second color palette — every tone still comes from the existing
+   * second color palette â€” every tone still comes from the existing
    * `colors.accent` set. Defaults to "secondary" so every pre-Batch-07
    * caller (story beats, egg hatching) renders byte-identical.
    */
@@ -90,3 +91,4 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
 });
+

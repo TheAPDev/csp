@@ -1,5 +1,6 @@
-import React from "react";
-import { View, Text, ScrollView, SafeAreaView, StyleSheet, ImageStyle } from "react-native";
+﻿import React from "react";
+import { View, Text, ScrollView, StyleSheet, ImageStyle } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { AssetImage } from "@components/AssetImage";
 import { PrimaryButton } from "@components/PrimaryButton";
 import { IconButton } from "@components/IconButton";
@@ -17,7 +18,7 @@ export function EpisodeDetailScreen({ episode, onStart, onBack }: EpisodeDetailS
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content}>
         <IconButton onPress={onBack} style={styles.back}>
-          <Text style={styles.backLabel}>←</Text>
+          <Text style={styles.backLabel}>â†</Text>
         </IconButton>
         <AssetImage id={episode.thumbnailAssetId} style={styles.hero as ImageStyle} />
         <Text style={styles.title}>{episode.title}</Text>
@@ -38,3 +39,4 @@ const styles = StyleSheet.create({
   teaser: { ...typography.bodyLarge, color: colors.text.secondary, marginBottom: spacing.xl },
   cta: { alignSelf: "stretch" },
 });
+

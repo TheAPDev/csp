@@ -1,8 +1,11 @@
-import React, { useEffect } from "react";
+﻿import React, { useEffect } from "react";
 import { View, StyleSheet, ImageStyle } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanimated";
 import { AssetImage } from "@components/AssetImage";
+import { AssetVideo } from "@components/AssetVideo";
 import { Dialogue } from "@components/Dialogue";
+import { getAsset } from "@assets/registry";
 import { colors, spacing, zIndex } from "@theme";
 import { cinematicCamera } from "@transitions";
 import { StoryBeat } from "./types";
@@ -16,10 +19,14 @@ interface StorySceneProps {
  * Renders a single cinematic story beat: background, subtle camera
  * motion (via the shared `cinematicCamera` transition primitive),
  * optional particle field, optional Companion/narrator dialogue.
- * This is the reusable rendering half of the StoryBeat contract —
+ * This is the reusable rendering half of the StoryBeat contract â€”
  * StoryPlayer owns sequencing, this owns a single beat's presentation.
  */
-export function StoryScene({ beat }: StorySceneProps) {
+interface StoryScenePropsWithVideo extends StorySceneProps {
+  useVideoBackground?: boolean;
+}
+
+export function StoryScene({ beat, useVideoBackground }: StoryScenePropsWithVideo) {
   const progress = useSharedValue(0);
 
   useEffect(() => {
@@ -42,10 +49,16 @@ export function StoryScene({ beat }: StorySceneProps) {
     };
   });
 
+  const hasBeatVideo = !!beat.videoAssetId && !!getAsset(beat.videoAssetId)?.source;
+
   return (
     <View style={styles.root}>
       <Animated.View style={[styles.backgroundWrap, cameraStyle]}>
-        <AssetImage id={beat.backgroundAssetId} style={styles.background as ImageStyle} />
+        {hasBeatVideo ? (
+          <AssetVideo id={beat.videoAssetId!} style={styles.background} shouldPlay isLooping />
+        ) : (
+          <AssetImage id={beat.backgroundAssetId} style={styles.background as ImageStyle} />
+        )}
       </Animated.View>
       {beat.particles && (
         <View style={styles.particleAnchor} pointerEvents="none">
@@ -68,3 +81,4 @@ const styles = StyleSheet.create({
   particleAnchor: { position: "absolute", top: "40%", left: "50%", zIndex: zIndex.hud },
   dialogueWrap: { position: "absolute", left: spacing.lg, right: spacing.lg, bottom: spacing.xxxl, zIndex: zIndex.hud },
 });
+

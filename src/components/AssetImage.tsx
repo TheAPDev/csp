@@ -1,5 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { Image, View, StyleSheet, ImageStyle, StyleProp } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, radius } from "@theme";
 import { AssetId, getAsset } from "@assets/registry";
 
@@ -29,3 +30,4 @@ const styles = StyleSheet.create({
     borderColor: colors.border.subtle,
   },
 });
+

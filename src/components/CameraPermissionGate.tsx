@@ -1,12 +1,13 @@
-import React from "react";
+﻿import React from "react";
 import { View, Text, Linking, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useCameraPermissions } from "expo-camera";
 import { PrimaryButton } from "./PrimaryButton";
 import { SecondaryButton } from "./SecondaryButton";
 import { colors, typography, spacing } from "@theme";
 
 interface CameraPermissionGateProps {
-  /** Child-facing reason shown while permission is being requested — keep it Companion-voiced, e.g. "Your Companion needs the camera to look for treasure." */
+  /** Child-facing reason shown while permission is being requested â€” keep it Companion-voiced, e.g. "Your Companion needs the camera to look for treasure." */
   reason: string;
   onCancel: () => void;
   children: React.ReactNode;
@@ -16,7 +17,7 @@ interface CameraPermissionGateProps {
  * The existing camera abstraction (Batch 04 originated this in
  * `missions/screens/CameraCaptureScreen.tsx`; Batch 06 extracts it
  * here so Treasure Hunt reuses it instead of inventing a parallel
- * permission flow — see master protocol §DO NOT ("Do not break
+ * permission flow â€” see master protocol Â§DO NOT ("Do not break
  * Mission camera functionality. Reuse the existing camera
  * abstraction."). Handles every state the protocol calls out:
  * loading, denied-but-askable, denied-forever (Settings deep link),
@@ -29,7 +30,7 @@ export function CameraPermissionGate({ reason, onCancel, children }: CameraPermi
   if (!permission) {
     return (
       <View style={styles.centeredRoot}>
-        <Text style={styles.message}>Getting the camera ready…</Text>
+        <Text style={styles.message}>Getting the camera readyâ€¦</Text>
       </View>
     );
   }
@@ -69,3 +70,4 @@ const styles = StyleSheet.create({
   message: { ...typography.body, color: colors.text.secondary, textAlign: "center", marginBottom: spacing.xl },
   cta: { alignSelf: "stretch", marginBottom: spacing.md },
 });
+

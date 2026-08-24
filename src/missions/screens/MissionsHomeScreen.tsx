@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from "react";
+﻿import React, { useMemo, useState } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { IconButton } from "@components/IconButton";
 import { colors, typography, spacing, radius } from "@theme";
@@ -29,7 +29,7 @@ const CATEGORY_FILTERS: (MissionCategory | "all")[] = [
 
 /**
  * Missions entry: filters + categories, Quick Quests (horizontal
- * scroll — genuinely improves discovery of a short, browsable set),
+ * scroll â€” genuinely improves discovery of a short, browsable set),
  * Long Quests (vertical list), and Completion History. Vertical
  * scrolling is the primary discovery axis for the screen as a whole.
  */
@@ -55,7 +55,7 @@ export function MissionsHomeScreen({ onSelectMission, onOpenHistory, onReturnToG
         <View style={styles.header}>
           <Text style={styles.title}>Missions</Text>
           <IconButton onPress={onOpenHistory}>
-            <Text style={styles.historyIcon}>🗂</Text>
+            <Text style={styles.historyIcon}>ðŸ—‚</Text>
           </IconButton>
         </View>
 
@@ -127,7 +127,7 @@ export function MissionsHomeScreen({ onSelectMission, onOpenHistory, onReturnToG
         )}
 
         {filtered.length === 0 && (
-          <Text style={styles.empty}>No quests match right now — try a different filter.</Text>
+          <Text style={styles.empty}>No quests match right now â€” try a different filter.</Text>
         )}
 
         <ReturnToGrove onPress={onReturnToGrove} />
@@ -172,3 +172,4 @@ const styles = StyleSheet.create({
   quickRow: { gap: spacing.sm },
   empty: { ...typography.body, color: colors.text.secondary, textAlign: "center", marginTop: spacing.xl },
 });
+

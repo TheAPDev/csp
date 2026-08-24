@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+﻿import React, { useEffect } from "react";
 import { StyleSheet, Dimensions } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -13,13 +14,13 @@ import { colors } from "@theme";
 const { width, height } = Dimensions.get("window");
 
 interface GroveAmbientProps {
-  /** Higher evolution stages feel slightly more alive — a few more motes drifting. */
+  /** Higher evolution stages feel slightly more alive â€” a few more motes drifting. */
   intensity?: number;
 }
 
 /**
  * Purely decorative, looping ambient layer that makes the Grove feel
- * alive without requiring any interaction — slow drifting light motes
+ * alive without requiring any interaction â€” slow drifting light motes
  * behind the Companion. Fully sound-off understandable (visual only).
  * Uses the same `duration.cinematic`-class pacing as the rest of the
  * app; no snappy motion.
@@ -77,3 +78,4 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent.secondary,
   },
 });
+

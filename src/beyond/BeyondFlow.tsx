@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "@theme";
 import { WorldScene } from "@worlds/WorldScene";
 import { Toast } from "@components/Toast";
@@ -24,8 +25,8 @@ interface BeyondFlowProps {
 
 /**
  * Orchestrates The Beyond: browse regions (available + beautifully
- * sealed side by side) → explore (tap points of interest) → complete
- * → back to browse. Same single-owner-of-sequencing pattern as every
+ * sealed side by side) â†’ explore (tap points of interest) â†’ complete
+ * â†’ back to browse. Same single-owner-of-sequencing pattern as every
  * other World's Flow component (MissionsFlow, TaleTrailsFlow,
  * TreasureHuntFlow, ClosetFlow, VaultFlow).
  */
@@ -54,7 +55,7 @@ export function BeyondFlow({ onReturnToGrove }: BeyondFlowProps) {
       triggerCompanionMoment("beyond", {
         notification: { kind: "adventure", message: `${region.title} explored!` },
       });
-      // Best-effort Supabase sync — never blocks the local reward flow.
+      // Best-effort Supabase sync â€” never blocks the local reward flow.
       recordBeyondCompletion("local-guest", region.id, reward);
       if (region.unlockAssetId) addInventoryItem("local-guest", region.unlockAssetId);
     }
@@ -96,7 +97,7 @@ export function BeyondFlow({ onReturnToGrove }: BeyondFlowProps) {
     <View style={styles.root}>
       {usesWorldBackground ? <WorldScene backgroundAssetId="THE_BEYOND_BACKGROUND">{content}</WorldScene> : content}
       <Toast
-        message="This part of The Beyond is still forming — check back soon!"
+        message="This part of The Beyond is still forming â€” check back soon!"
         visible={tease}
         onHide={() => setTease(false)}
       />
@@ -107,3 +108,4 @@ export function BeyondFlow({ onReturnToGrove }: BeyondFlowProps) {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background.primary },
 });
+

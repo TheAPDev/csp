@@ -1,5 +1,6 @@
-import React from "react";
-import { View, Text, StyleSheet, SafeAreaView } from "react-native";
+﻿import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { RewardBadge } from "@components/RewardBadge";
 import { PrimaryButton } from "@components/PrimaryButton";
 import { CompanionReaction } from "@components/CompanionReaction";
@@ -12,8 +13,8 @@ interface StoryRewardScreenProps {
 }
 
 /**
- * Reuses `RewardBadge` — the same reward-rendering component Missions
- * uses — rather than a parallel reward UI, per the batch's "reuse
+ * Reuses `RewardBadge` â€” the same reward-rendering component Missions
+ * uses â€” rather than a parallel reward UI, per the batch's "reuse
  * reward system" instruction.
  */
 export function StoryRewardScreen({ episode, onContinue }: StoryRewardScreenProps) {
@@ -51,3 +52,4 @@ const styles = StyleSheet.create({
   rewardRow: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm, justifyContent: "center", marginBottom: spacing.xl },
   cta: { alignSelf: "stretch" },
 });
+

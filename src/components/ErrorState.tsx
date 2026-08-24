@@ -1,5 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, typography, spacing } from "@theme";
 import { PrimaryButton } from "./PrimaryButton";
 
@@ -8,7 +9,7 @@ interface ErrorStateProps {
   onRetry?: () => void;
 }
 
-/** Gentle, non-alarming error state — no red screens for children. */
+/** Gentle, non-alarming error state â€” no red screens for children. */
 export function ErrorState({ message = "Something wandered off. Let's try again.", onRetry }: ErrorStateProps) {
   return (
     <View style={styles.wrap}>
@@ -22,3 +23,4 @@ const styles = StyleSheet.create({
   wrap: { flex: 1, alignItems: "center", justifyContent: "center", padding: spacing.xl },
   message: { ...typography.body, color: colors.text.secondary, textAlign: "center" },
 });
+

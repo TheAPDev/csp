@@ -1,5 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { View, StyleSheet, ViewStyle, StyleProp } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, spacing, radius, shadows } from "@theme";
 
 interface CardProps {
@@ -23,3 +24,4 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
 });
+

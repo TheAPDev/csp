@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
-import { View, Text, StyleSheet, SafeAreaView } from "react-native";
+﻿import React, { useEffect } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { AssetImage } from "@components/AssetImage";
 import { CompanionReaction } from "@components/CompanionReaction";
@@ -13,10 +14,10 @@ interface CollectionScreenProps {
 }
 
 /**
- * Interaction → collection beat. Reuses `ParticleField` (built for
+ * Interaction â†’ collection beat. Reuses `ParticleField` (built for
  * story beats / egg hatching in Batches 02/05) rather than inventing
- * a parallel particle system — same magical language throughout the
- * app, per master protocol §DO NOT ("Do not create a new visual
+ * a parallel particle system â€” same magical language throughout the
+ * app, per master protocol Â§DO NOT ("Do not create a new visual
  * language"). Auto-advances to the reward screen after the burst;
  * there's nothing here worth requiring a tap for.
  */
@@ -60,3 +61,4 @@ const styles = StyleSheet.create({
   treasureArt: { width: 60, height: 60, borderRadius: radius.md },
   line: { ...typography.body, color: colors.text.primary, textAlign: "center", marginTop: spacing.lg },
 });
+

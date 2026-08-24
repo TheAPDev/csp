@@ -1,5 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, typography, spacing, radius, shadows } from "@theme";
 import { AssetImage } from "./AssetImage";
 import { AssetId } from "@assets/registry";
@@ -31,3 +32,4 @@ const styles = StyleSheet.create({
   icon: { width: 56, height: 56, borderRadius: radius.md },
   label: { ...typography.label, color: colors.text.primary },
 });
+

@@ -1,5 +1,6 @@
-import React from "react";
-import { View, Text, ScrollView, SafeAreaView, StyleSheet } from "react-native";
+﻿import React from "react";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, typography, spacing } from "@theme";
 import { BeyondRegionDefinition } from "@apptypes";
 import { beyondRegions } from "../content/regions";
@@ -13,7 +14,7 @@ interface BeyondHomeScreenProps {
   onReturnToGrove: () => void;
 }
 
-/** Discovery: every region in one continuous list — available and sealed side by side, so The Beyond reads as one expansive place, not two zones. */
+/** Discovery: every region in one continuous list â€” available and sealed side by side, so The Beyond reads as one expansive place, not two zones. */
 export function BeyondHomeScreen({ onSelectRegion, onSealedTease, onReturnToGrove }: BeyondHomeScreenProps) {
   const isRegionComplete = useBeyondStore((s) => s.isRegionComplete);
 
@@ -21,7 +22,7 @@ export function BeyondHomeScreen({ onSelectRegion, onSealedTease, onReturnToGrov
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>The Beyond</Text>
-        <Text style={styles.subtitle}>Further than the Grove, deeper than any map — go gently.</Text>
+        <Text style={styles.subtitle}>Further than the Grove, deeper than any map â€” go gently.</Text>
 
         {beyondRegions.map((region) => (
           <BeyondRegionCard
@@ -45,3 +46,4 @@ const styles = StyleSheet.create({
   title: { ...typography.display, color: colors.text.primary },
   subtitle: { ...typography.body, color: colors.text.secondary, marginTop: spacing.xs, marginBottom: spacing.lg },
 });
+

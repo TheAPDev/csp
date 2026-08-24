@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "@theme";
 import { WorldScene } from "@worlds/WorldScene";
 import { Toast } from "@components/Toast";
@@ -51,9 +52,9 @@ export function TaleTrailsFlow({ onReturnToGrove }: TaleTrailsFlowProps) {
     recordCompletion(episode.id, reward, choiceId);
     triggerCompanionMoment("story", {
       traitLean: episode.traitLean,
-      notification: { kind: "adventure", message: `${episode.title} — trail complete!` },
+      notification: { kind: "adventure", message: `${episode.title} â€” trail complete!` },
     });
-    // Best-effort Supabase sync — never blocks the local reward flow.
+    // Best-effort Supabase sync â€” never blocks the local reward flow.
     recordEpisodeCompletion("local-guest", episode.id);
   }
 
@@ -108,7 +109,7 @@ export function TaleTrailsFlow({ onReturnToGrove }: TaleTrailsFlowProps) {
     <View style={styles.root}>
       {usesWorldBackground ? <WorldScene backgroundAssetId="TALE_TRAILS_BACKGROUND">{content}</WorldScene> : content}
       <Toast
-        message="This trail is still forming — check back soon!"
+        message="This trail is still forming â€” check back soon!"
         visible={tease}
         onHide={() => setTease(false)}
       />
@@ -119,3 +120,4 @@ export function TaleTrailsFlow({ onReturnToGrove }: TaleTrailsFlowProps) {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background.primary },
 });
+

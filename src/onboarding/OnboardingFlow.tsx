@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
+﻿import React, { useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useOnboardingStore, OnboardingStep } from "@state/onboardingStore";
 import { LoadingIndicator } from "@components/LoadingIndicator";
 import { IconButton } from "@components/IconButton";
 import { colors, typography, spacing, zIndex } from "@theme";
-import { WelcomeScreen } from "./screens/WelcomeScreen";
 import { AccountEntryScreen } from "./screens/AccountEntryScreen";
 import { BeginScreen } from "./screens/BeginScreen";
 import { IntroStoryScreen } from "./screens/IntroStoryScreen";
@@ -43,7 +43,7 @@ export function OnboardingFlow({ onFinished }: OnboardingFlowProps) {
       {renderStep(step)}
       {canGoBack && (
         <IconButton onPress={goBack} style={styles.back}>
-          <Text style={styles.backLabel}>←</Text>
+          <Text style={styles.backLabel}>â†</Text>
         </IconButton>
       )}
     </View>
@@ -52,8 +52,6 @@ export function OnboardingFlow({ onFinished }: OnboardingFlowProps) {
 
 function renderStep(step: OnboardingStep) {
   switch (step) {
-    case "welcome":
-      return <WelcomeScreen />;
     case "account":
       return <AccountEntryScreen />;
     case "begin":
@@ -82,3 +80,4 @@ const styles = StyleSheet.create({
   back: { position: "absolute", top: spacing.xl, left: spacing.lg, zIndex: zIndex.hud },
   backLabel: { ...typography.heading, color: colors.text.primary },
 });
+

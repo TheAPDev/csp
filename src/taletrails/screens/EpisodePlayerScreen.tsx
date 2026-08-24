@@ -1,8 +1,8 @@
-import React, { useMemo, useState } from "react";
-import { View, StyleSheet } from "react-native";
+﻿import React, { useMemo, useState } from "react";
+import { View, StyleSheet, Pressable } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { StoryPlayer } from "@story/StoryPlayer";
 import { StoryScene } from "@story/StoryScene";
-import { Pressable } from "react-native";
 import { StoryEpisodeDefinition, StoryChoiceOption } from "@apptypes";
 import { StoryBeat } from "@story/types";
 import { withCompanionName } from "../content/storyDefinitions";
@@ -22,7 +22,7 @@ type Phase = "opening" | "choice" | "reaction" | "closing";
  * dedicated `ChoicePrompt` screen (not a StoryBeat) pauses the story;
  * the chosen option plays one short reaction `StoryScene` beat
  * (tap-to-continue, same as any other beat); then `closingBeats` play
- * through a second `StoryPlayer` instance — reconnecting to the same
+ * through a second `StoryPlayer` instance â€” reconnecting to the same
  * ending regardless of choice. This keeps `StoryPlayer`/`StoryBeat`
  * completely unchanged, per the continuity doc's stability rule.
  */
@@ -88,3 +88,4 @@ export function EpisodePlayerScreen({ episode, onComplete }: EpisodePlayerScreen
 const styles = StyleSheet.create({
   fill: { flex: 1 },
 });
+

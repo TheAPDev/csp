@@ -1,5 +1,6 @@
-import React from "react";
-import { View, Text, SafeAreaView, StyleSheet } from "react-native";
+﻿import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, typography, spacing } from "@theme";
 import { AssetImage } from "@components/AssetImage";
 import { ProgressBar } from "@components/ProgressBar";
@@ -19,7 +20,7 @@ interface VaultRewardDetailScreenProps {
 
 /**
  * Locked vs eligible, per Batch 07 spec. A locked reward shows plain
- * progress and no button that could be mistaken for a purchase — the
+ * progress and no button that could be mistaken for a purchase â€” the
  * child is never one accidental tap away from spending Collector
  * Tokens they don't yet have.
  */
@@ -73,3 +74,4 @@ const styles = StyleSheet.create({
   statusLine: { ...typography.body, color: colors.text.secondary, textAlign: "center" },
   cta: { alignSelf: "stretch", marginTop: spacing.sm },
 });
+

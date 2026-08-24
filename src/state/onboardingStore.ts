@@ -4,7 +4,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { EggId } from "@apptypes";
 
 export type OnboardingStep =
-  | "welcome"
   | "account"
   | "begin"
   | "introStory"
@@ -16,7 +15,6 @@ export type OnboardingStep =
   | "complete";
 
 const STEP_ORDER: OnboardingStep[] = [
-  "welcome",
   "account",
   "begin",
   "introStory",
@@ -29,7 +27,7 @@ const STEP_ORDER: OnboardingStep[] = [
 ];
 
 /** Steps that cannot be returned to via the back affordance. */
-const NO_BACK_STEPS: ReadonlySet<OnboardingStep> = new Set(["welcome", "hatching", "complete"]);
+const NO_BACK_STEPS: ReadonlySet<OnboardingStep> = new Set(["account", "hatching", "complete"]);
 
 interface OnboardingStoreState {
   step: OnboardingStep;
@@ -60,7 +58,7 @@ interface OnboardingStoreState {
 export const useOnboardingStore = create<OnboardingStoreState>()(
   persist(
     (set, get) => ({
-      step: "welcome",
+      step: "account",
       selectedEgg: null,
       companionName: "",
       firstPromiseId: null,
@@ -91,7 +89,7 @@ export const useOnboardingStore = create<OnboardingStoreState>()(
 
       restart: () =>
         set({
-          step: "welcome",
+          step: "account",
           selectedEgg: null,
           companionName: "",
           firstPromiseId: null,

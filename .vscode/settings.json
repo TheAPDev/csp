@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^python -c \"import cv2, sys; v = cv2\\.VideoCapture\\(r'D:\\\\Downloads\\\\csp\\\\src\\\\assets\\\\videos\\\\onboarding_loop\\.mp4'\\); print\\('opened', v\\.isOpened\\(\\)\\); print\\('frames', int\\(v\\.get\\(cv2\\.CAP_PROP_FRAME_COUNT\\)\\)\\); print\\('fps', v\\.get\\(cv2\\.CAP_PROP_FPS\\)\\); v\\.release\\(\\)\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

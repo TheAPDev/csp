@@ -1,5 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { View, StyleSheet, ImageStyle } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, zIndex } from "@theme";
 import { AssetImage } from "@components/AssetImage";
 import { AssetId } from "@assets/registry";
@@ -29,3 +30,4 @@ const styles = StyleSheet.create({
   background: { ...StyleSheet.absoluteFillObject, zIndex: zIndex.world },
   content: { flex: 1, zIndex: zIndex.hud },
 });
+

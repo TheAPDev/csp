@@ -1,5 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { View, Pressable, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { colors, typography, spacing, radius, touchTarget, shadows } from "@theme";
 
@@ -18,7 +19,7 @@ interface BottomNavProps {
 /**
  * Bottom navigation foundation. Radial/orbit navigation variants for
  * The Grove hub can be layered on top of this same `destinations`
- * contract in a later batch — do not create a parallel nav data shape.
+ * contract in a later batch â€” do not create a parallel nav data shape.
  */
 export function BottomNav({ destinations, activeKey, onSelect }: BottomNavProps) {
   return (
@@ -63,3 +64,4 @@ const styles = StyleSheet.create({
   label: { ...typography.caption, color: colors.text.secondary },
   labelActive: { color: colors.text.primary },
 });
+

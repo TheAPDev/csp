@@ -1,5 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { View, StyleSheet, Modal as RNModal } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, spacing, radius, elevation } from "@theme";
 
 interface SheetProps {
@@ -8,7 +9,7 @@ interface SheetProps {
   children: React.ReactNode;
 }
 
-/** Bottom sheet primitive — used for Companion detail, inventory peek, etc. */
+/** Bottom sheet primitive â€” used for Companion detail, inventory peek, etc. */
 export function Sheet({ visible, onClose, children }: SheetProps) {
   return (
     <RNModal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
@@ -34,3 +35,4 @@ const styles = StyleSheet.create({
     zIndex: elevation.sheet,
   },
 });
+

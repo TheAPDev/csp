@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { Pressable, Text, View, StyleSheet, ImageStyle } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { AssetImage } from "@components/AssetImage";
 import { ParticleField } from "@story/index";
@@ -11,7 +12,7 @@ import { CompanionTraits } from "@apptypes";
 
 /**
  * A short, one-way cinematic beat (see NO_BACK_STEPS in onboardingStore
- * — hatching cannot be replayed). Auto-advances, but a tap also
+ * â€” hatching cannot be replayed). Auto-advances, but a tap also
  * advances immediately so an interrupted/slow animation never
  * soft-locks the child.
  */
@@ -27,7 +28,7 @@ export function HatchingScreen() {
 
   useEffect(() => {
     if (!appliedTraits) {
-      // Apply the egg's subtle internal trait lean once, on hatch — never shown to the child.
+      // Apply the egg's subtle internal trait lean once, on hatch â€” never shown to the child.
       (Object.entries(egg.traitLean) as [keyof CompanionTraits, number][]).forEach(([trait, amount]) => {
         nudgeTrait(trait, amount);
       });
@@ -60,7 +61,7 @@ export function HatchingScreen() {
         <AssetImage id={egg.assetId} style={styles.egg as ImageStyle} />
         <ParticleField active={burst} count={14} />
       </View>
-      <Text style={styles.hint}>{done ? "Tap to continue" : "Something is happening…"}</Text>
+      <Text style={styles.hint}>{done ? "Tap to continue" : "Something is happeningâ€¦"}</Text>
     </Pressable>
   );
 }
@@ -71,3 +72,4 @@ const styles = StyleSheet.create({
   egg: { width: 120, height: 160, borderRadius: radius.lg },
   hint: { ...typography.caption, color: colors.text.secondary, position: "absolute", bottom: spacing.xxl },
 });
+

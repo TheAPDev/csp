@@ -1,5 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, typography, spacing, radius, shadows } from "@theme";
 import { AssetImage } from "./AssetImage";
 import { AssetId } from "@assets/registry";
@@ -37,3 +38,4 @@ const styles = StyleSheet.create({
   speaker: { ...typography.label, color: colors.accent.secondary, marginBottom: spacing.xxs },
   line: { ...typography.body, color: colors.text.primary },
 });
+

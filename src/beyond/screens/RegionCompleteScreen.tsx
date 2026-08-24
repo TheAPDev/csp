@@ -1,5 +1,6 @@
-import React from "react";
-import { View, Text, StyleSheet, SafeAreaView } from "react-native";
+﻿import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { RewardBadge } from "@components/RewardBadge";
 import { PrimaryButton } from "@components/PrimaryButton";
 import { CompanionReaction } from "@components/CompanionReaction";
@@ -8,14 +9,14 @@ import { BeyondRegionDefinition } from "@apptypes";
 
 interface RegionCompleteScreenProps {
   region: BeyondRegionDefinition;
-  /** False on a revisit after the region was already completed once before — no re-granted reward, still worth celebrating quietly. */
+  /** False on a revisit after the region was already completed once before â€” no re-granted reward, still worth celebrating quietly. */
   firstTime: boolean;
   onContinue: () => void;
 }
 
 /**
- * Reuses `RewardBadge` — the exact component Missions/Tale Trails
- * use — per the batch's "reuse reward system" instruction, rather
+ * Reuses `RewardBadge` â€” the exact component Missions/Tale Trails
+ * use â€” per the batch's "reuse reward system" instruction, rather
  * than a parallel Beyond-specific reward UI.
  */
 export function RegionCompleteScreen({ region, firstTime, onContinue }: RegionCompleteScreenProps) {
@@ -57,3 +58,4 @@ const styles = StyleSheet.create({
   rewardRow: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm, justifyContent: "center", marginBottom: spacing.xl },
   cta: { alignSelf: "stretch" },
 });
+

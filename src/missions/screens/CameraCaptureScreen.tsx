@@ -1,5 +1,6 @@
-import React, { useRef, useState } from "react";
+﻿import React, { useRef, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { CameraView } from "expo-camera";
 import * as Haptics from "expo-haptics";
 import { CameraPermissionGate } from "@components/CameraPermissionGate";
@@ -13,7 +14,7 @@ interface CameraCaptureScreenProps {
 /**
  * Camera step of the photo submission flow. Permission handling
  * (denied/canAskAgain branching, loading, cancel) now lives in the
- * shared `CameraPermissionGate` (Batch 06) — Treasure Hunt's
+ * shared `CameraPermissionGate` (Batch 06) â€” Treasure Hunt's
  * exploration screen reuses the exact same gate rather than a
  * parallel permission flow. This screen still owns everything
  * specific to a single-shot photo capture: the shutter, capture
@@ -51,7 +52,7 @@ export function CameraCaptureScreen({ onCaptured, onCancel }: CameraCaptureScree
         <CameraView ref={cameraRef} style={styles.camera} facing="back" />
         {captureError && (
           <View style={styles.errorBanner}>
-            <Text style={styles.errorText}>That didn't quite work — let's try again.</Text>
+            <Text style={styles.errorText}>That didn't quite work â€” let's try again.</Text>
           </View>
         )}
         <View style={styles.controls}>
@@ -112,3 +113,4 @@ const styles = StyleSheet.create({
   },
   errorText: { ...typography.caption, color: colors.text.primary },
 });
+

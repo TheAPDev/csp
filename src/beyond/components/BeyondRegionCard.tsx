@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+﻿import React, { useEffect } from "react";
 import { View, Text, Pressable, StyleSheet, ImageStyle } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing } from "react-native-reanimated";
 import { AssetImage } from "@components/AssetImage";
@@ -11,7 +12,7 @@ interface BeyondRegionCardProps {
   region: BeyondRegionDefinition;
   explored: boolean;
   onPress: () => void;
-  /** Called instead of `onPress` when the region isn't open yet — a gentle Companion tease, never a dead tap. */
+  /** Called instead of `onPress` when the region isn't open yet â€” a gentle Companion tease, never a dead tap. */
   onSealedPress: () => void;
 }
 
@@ -19,7 +20,7 @@ interface BeyondRegionCardProps {
  * Available regions look like any other card. Not-yet-open regions
  * reuse Tale Trails' EpisodeCard shimmer treatment (same tokens, same
  * "in-world sealed" framing) rather than a generic greyed-out "Coming
- * Soon" box — per the master protocol's explicit COMING SOON rule.
+ * Soon" box â€” per the master protocol's explicit COMING SOON rule.
  */
 export function BeyondRegionCard({ region, explored, onPress, onSealedPress }: BeyondRegionCardProps) {
   const shimmer = useSharedValue(0);
@@ -63,7 +64,7 @@ export function BeyondRegionCard({ region, explored, onPress, onSealedPress }: B
         <Text style={styles.teaser} numberOfLines={2}>
           {region.teaser}
         </Text>
-        {explored && region.available && <Text style={styles.doneBadge}>Explored ✓</Text>}
+        {explored && region.available && <Text style={styles.doneBadge}>Explored âœ“</Text>}
       </View>
     </Pressable>
   );
@@ -96,3 +97,4 @@ const styles = StyleSheet.create({
   teaser: { ...typography.caption, color: colors.text.secondary, marginTop: spacing.xxs, minHeight: 30 },
   doneBadge: { ...typography.caption, color: colors.accent.primary, marginTop: spacing.xxs },
 });
+

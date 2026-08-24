@@ -1,5 +1,6 @@
-import React from "react";
-import { View, Text, ScrollView, SafeAreaView, StyleSheet } from "react-native";
+﻿import React from "react";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, typography, spacing } from "@theme";
 import { StatusControl } from "@components/StatusControl";
 import { ReturnToGrove } from "@components/ReturnToGrove";
@@ -64,3 +65,4 @@ const styles = StyleSheet.create({
   balanceRow: { flexDirection: "row", gap: spacing.md },
   list: { gap: spacing.md },
 });
+

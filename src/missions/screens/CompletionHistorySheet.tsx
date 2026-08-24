@@ -1,5 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Sheet } from "@components/Sheet";
 import { colors, typography, spacing, radius } from "@theme";
 import { useMissionsStore } from "@state/missionsStore";
@@ -17,7 +18,7 @@ export function CompletionHistorySheet({ visible, onClose }: CompletionHistorySh
     <Sheet visible={visible} onClose={onClose}>
       <Text style={styles.title}>Completion History</Text>
       {completions.length === 0 ? (
-        <Text style={styles.empty}>No quests completed yet — your first one is waiting!</Text>
+        <Text style={styles.empty}>No quests completed yet â€” your first one is waiting!</Text>
       ) : (
         <ScrollView style={styles.list}>
           {completions.map((c, i) => {
@@ -30,7 +31,7 @@ export function CompletionHistorySheet({ visible, onClose }: CompletionHistorySh
                   <Text style={styles.date}>{date.toLocaleDateString()}</Text>
                 </View>
                 <Text style={styles.reward}>
-                  +{c.reward.xp} XP · +{c.reward.coins} Coins
+                  +{c.reward.xp} XP Â· +{c.reward.coins} Coins
                 </Text>
               </View>
             );
@@ -58,3 +59,4 @@ const styles = StyleSheet.create({
   date: { ...typography.caption, color: colors.text.secondary },
   reward: { ...typography.caption, color: colors.accent.primary, marginLeft: spacing.sm, borderRadius: radius.sm },
 });
+

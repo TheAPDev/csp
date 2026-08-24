@@ -1,162 +1,191 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { View, Text, StyleSheet, SafeAreaView } from "react-native";
+﻿import React, { useEffect, useMemo, useState } from "react";
+import { View, Pressable, StyleSheet, Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { WorldScene } from "@worlds/WorldScene";
-import { worldRegistry, WorldId } from "@worlds/WorldRegistry";
-import { typography, colors, spacing } from "@theme";
-import {
-  CompanionReaction,
-  CompanionMood,
-  Dialogue,
-  StatusHub,
-  GroveAmbient,
-  GroveDecor,
-  WorldGateway,
-  GatewayDestination,
-  TodaysAdventureCard,
-} from "@components/index";
+import { WorldId } from "@worlds/WorldRegistry";
+import { colors, spacing } from "@theme";
+import { CompanionReaction, GroveAmbient, GroveDecor } from "@components/index";
 import { useCompanionStore } from "@state/companionStore";
 import { useProgressionStore } from "@state/progressionStore";
 import { useGroveStore, evolutionStageForLevel, groveBackgroundForStage } from "@state/groveStore";
 import { leanFor } from "@companion/evolution";
-import { triggerCompanionMoment } from "@companion/companionMoments";
 
 interface GroveWorldProps {
-  /** Supplied by RootNavigator so tapping a gateway can drive the World-switch transition. */
   onNavigateToWorld?: (world: WorldId) => void;
 }
 
-const gateways: Omit<GatewayDestination, "icon">[] = [
-  { key: "missions", label: worldRegistry.missions.displayName, assetId: "GATEWAY_MISSIONS", hint: "A quest awaits" },
-  { key: "taleTrails", label: worldRegistry.taleTrails.displayName, assetId: "GATEWAY_TALE_TRAILS", hint: "Step into a story" },
-  { key: "treasureHunt", label: worldRegistry.treasureHunt.displayName, assetId: "GATEWAY_TREASURE_HUNT", hint: "Hunt for treasure" },
-  { key: "theBeyond", label: worldRegistry.theBeyond.displayName, assetId: "GATEWAY_THE_BEYOND", hint: "A distant path" },
-  { key: "closet", label: worldRegistry.closet.displayName, assetId: "GATEWAY_CLOSET", hint: "Dress up your Companion" },
-  { key: "vault", label: worldRegistry.vault.displayName, assetId: "GATEWAY_VAULT", hint: "Real rewards await" },
+const radialOptions: Array<{ id: WorldId; icon: string }> = [
+  { id: "missions", icon: "✦" },
+  { id: "treasureHunt", icon: "✧" },
+  { id: "taleTrails", icon: "✹" },
+  { id: "theBeyond", icon: "✺" },
+  { id: "closet", icon: "◌" },
+  { id: "vault", icon: "◎" },
 ];
 
-const REACTION_LINES: Record<CompanionMood, string> = {
-  idle: "I'm so glad you're here.",
-  happy: "That tickles! Thank you.",
-  curious: "What should we explore today?",
-  sleepy: "Mmm... just resting my eyes.",
-  celebrating: "We did it together!",
-  thinking: "Hmm... I wonder what today will bring.",
-  encouraging: "You've got this. I believe in you.",
-  questReaction: "That quest is calling your name.",
-  storyReaction: "I love how that story turned out.",
-  rewardReaction: "Ooh, what did you find?",
-  interaction: "You found me!",
-  reflective: "I've been thinking about our adventures together.",
-};
-
-/**
- * The Grove — the emotional home of WONDERKIN. Companion center
- * stage, a living (ambiently animated) environment, "Today's
- * Adventure" as the single obvious primary action, a single
- * unobtrusive status access point, and gateway-based world
- * navigation. Deliberately NOT a dashboard — see master protocol.
- */
 export default function GroveWorld({ onNavigateToWorld }: GroveWorldProps) {
-  const def = worldRegistry.grove;
-
-  const companionName = useCompanionStore((s) => s.name);
   const mood = useCompanionStore((s) => s.mood);
   const traits = useCompanionStore((s) => s.traits);
-
   const xp = useProgressionStore((s) => s.xp);
-  const level = useProgressionStore((s) => s.level);
   const coins = useProgressionStore((s) => s.coins);
-  const adventureTickets = useProgressionStore((s) => s.adventureTickets);
-  const collectorTokens = useProgressionStore((s) => s.collectorTokens);
-  const unreadNotifications = useProgressionStore((s) => s.unreadNotificationCount());
-  const markAllNotificationsRead = useProgressionStore((s) => s.markAllNotificationsRead);
-
+  const level = useProgressionStore((s) => s.level);
   const recordVisit = useGroveStore((s) => s.recordVisit);
 
-  const [showReaction, setShowReaction] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     recordVisit();
-  }, []);
+  }, [recordVisit]);
 
-  // Environmental evolution: the background is a pure function of
-  // progression level, so the Grove can never desync from progress.
   const evolutionStage = useMemo(() => evolutionStageForLevel(level), [level]);
   const backgroundAssetId = useMemo(() => groveBackgroundForStage(evolutionStage), [evolutionStage]);
-
-  // The Companion's current developmental lean — always derived live
-  // from traits (see @companion/evolution), never stored. Drives the
-  // Grove's decoration layer only; never rendered as a label/score.
   const lean = useMemo(() => leanFor(traits), [traits]);
-
-  const displayName = companionName || "your Companion";
-
-  function handleCompanionTap() {
-    // A small, alive interaction: the dedicated "interaction" mood
-    // (Batch 08), a quiet bond nudge (never shown as a number), and a
-    // short line — all without leaving the Grove.
-    triggerCompanionMoment("interaction", { traitLean: { bond: 0.01 } });
-    setShowReaction(true);
-    setTimeout(() => setShowReaction(false), 2600);
-  }
-
-  function handleBeginAdventure() {
-    onNavigateToWorld?.("missions");
-  }
 
   return (
     <WorldScene backgroundAssetId={backgroundAssetId}>
       <GroveAmbient intensity={evolutionStage === 2 ? 10 : evolutionStage === 1 ? 8 : 6} />
       <GroveDecor lean={lean} stage={evolutionStage} />
 
-      <SafeAreaView style={styles.safeArea} pointerEvents="box-none">
-        <View style={styles.topRow} pointerEvents="box-none">
-          <Text style={styles.greeting}>The Grove</Text>
-          <StatusHub
-            level={level}
-            xp={xp}
-            coins={coins}
-            adventureTickets={adventureTickets}
-            collectorTokens={collectorTokens}
-            unreadNotifications={unreadNotifications}
-            onOpenNotifications={markAllNotificationsRead}
-          />
+      <View style={styles.scene} pointerEvents="box-none">
+        <View style={styles.statsPanel}>
+          <View style={styles.statRow}>
+            <Text style={styles.statLabel}>XP</Text>
+            <Text style={styles.statValue}>{xp}</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statRow}>
+            <Text style={styles.statLabel}>Coins</Text>
+            <Text style={styles.statValue}>{coins}</Text>
+          </View>
         </View>
 
         <View style={styles.centerStage} pointerEvents="box-none">
-          <CompanionReaction mood={mood} size={168} onPress={handleCompanionTap} />
-          {companionName ? <Text style={styles.companionName}>{displayName}</Text> : null}
-          {showReaction && <Dialogue speakerName={displayName} line={REACTION_LINES[mood]} />}
+          <CompanionReaction mood={mood} size={170} onPress={() => undefined} />
         </View>
 
-        <TodaysAdventureCard
-          title="The Whispering Path"
-          subtitle="A short quest is ready whenever you are."
-          onPress={handleBeginAdventure}
-        />
+        <View style={styles.menuRoot} pointerEvents="box-none">
+          {radialOptions.map((option, index) => {
+            const startAngle = 0;
+            const endAngle = 180;
+            const angleDeg = startAngle + (endAngle - startAngle) * (index / (radialOptions.length - 1));
+            const radius = 94;
+            const arcX = menuOpen ? Math.cos((angleDeg * Math.PI) / 180) * radius : 0;
+            const arcY = menuOpen ? -Math.sin((angleDeg * Math.PI) / 180) * radius - 26 : 0;
 
-        <View style={styles.gatewayWrap}>
-          <WorldGateway
-            destinations={gateways.map((g) => ({ ...g, icon: null }))}
-            onEnter={(key) => onNavigateToWorld?.(key as WorldId)}
-          />
+            return (
+              <Pressable
+                key={option.id}
+                style={[
+                  styles.menuOption,
+                  {
+                    opacity: menuOpen ? 1 : 0,
+                    transform: [{ translateX: arcX }, { translateY: arcY }],
+                    pointerEvents: menuOpen ? "auto" : "none",
+                  },
+                ]}
+                onPress={() => onNavigateToWorld?.(option.id)}
+              >
+                <Text style={styles.optionIcon}>{option.icon}</Text>
+              </Pressable>
+            );
+          })}
+
+          <Pressable style={styles.menuButton} onPress={() => setMenuOpen((value) => !value)}>
+            <Text style={styles.menuIcon}>⚡</Text>
+          </Pressable>
         </View>
-      </SafeAreaView>
+      </View>
     </WorldScene>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, justifyContent: "space-between" },
-  topRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    paddingHorizontal: spacing.xl,
-    paddingTop: spacing.md,
+  scene: {
+    flex: 1,
   },
-  greeting: { ...typography.title, color: colors.text.primary },
-  centerStage: { alignItems: "center", justifyContent: "center", gap: spacing.sm },
-  companionName: { ...typography.heading, color: colors.text.primary },
-  gatewayWrap: { paddingBottom: spacing.xl, paddingTop: spacing.lg },
+  statsPanel: {
+    position: "absolute",
+    top: 26,
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(9, 16, 28, 0.72)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.2)",
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    zIndex: 19,
+    minWidth: 200,
+    justifyContent: "space-between",
+  },
+  statRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  statDivider: {
+    width: 1,
+    height: 18,
+    backgroundColor: "rgba(255,255,255,0.18)",
+    marginHorizontal: 10,
+  },
+  statLabel: {
+    color: colors.text.primary,
+    fontSize: 12,
+    opacity: 0.8,
+    letterSpacing: 0.4,
+  },
+  statValue: {
+    color: colors.text.primary,
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  centerStage: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  menuRoot: {
+    position: "absolute",
+    bottom: 24,
+    alignSelf: "center",
+    width: 290,
+    height: 170,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  menuButton: {
+    position: "absolute",
+    bottom: 2,
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: "rgba(23, 30, 46, 0.72)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.28)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
+  },
+  menuIcon: {
+    fontSize: 28,
+    color: colors.text.primary,
+  },
+  menuOption: {
+    position: "absolute",
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: "rgba(11, 16, 26, 0.7)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.2)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 11,
+  },
+  optionIcon: {
+    fontSize: 22,
+  },
 });
+

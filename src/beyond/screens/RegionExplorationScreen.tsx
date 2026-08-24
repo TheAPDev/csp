@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { View, Text, Pressable, StyleSheet, ImageStyle } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing } from "react-native-reanimated";
 import { AssetImage } from "@components/AssetImage";
@@ -16,7 +17,7 @@ interface RegionExplorationScreenProps {
 }
 
 /**
- * The interactive region itself — full-bleed background with a
+ * The interactive region itself â€” full-bleed background with a
  * handful of glowing points of interest to tap, in-world (no
  * counters, no HUD, no coordinates), matching Treasure Hunt's
  * "no numbers on the discovery HUD" rule even though this isn't a
@@ -163,3 +164,4 @@ const styles = StyleSheet.create({
   },
   leaveLabel: { ...typography.label, color: colors.text.primary },
 });
+

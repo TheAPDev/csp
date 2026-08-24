@@ -1,5 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { View, Text, Pressable, StyleSheet, ImageStyle } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { AssetImage } from "@components/AssetImage";
 import { colors, typography, spacing, radius, shadows } from "@theme";
@@ -8,8 +9,8 @@ import { eggDefinitions, EggDefinition } from "../content/eggs";
 
 /**
  * Three mysterious eggs. Differences are conveyed visually and via a
- * short clue only — never labeled as personality types, and no hidden
- * trait is ever revealed here (master protocol §THREE EGGS).
+ * short clue only â€” never labeled as personality types, and no hidden
+ * trait is ever revealed here (master protocol Â§THREE EGGS).
  */
 export function EggSelectionScreen() {
   const selectEgg = useOnboardingStore((s) => s.selectEgg);
@@ -63,3 +64,4 @@ const styles = StyleSheet.create({
   eggImage: { width: 64, height: 88, borderRadius: radius.md, marginBottom: spacing.sm },
   clue: { ...typography.caption, color: colors.text.secondary, textAlign: "center" },
 });
+

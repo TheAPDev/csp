@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, SafeAreaView } from "react-native";
+﻿import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { CompanionReaction } from "@components/CompanionReaction";
 import { PrimaryButton } from "@components/PrimaryButton";
@@ -15,9 +16,9 @@ interface VerificationScreenProps {
 }
 
 /**
- * "Companion examines…" beat. Talks to MissionVerificationService
- * only through its interface — no technical AI language is ever
- * rendered here, per master protocol §AI VERIFICATION.
+ * "Companion examinesâ€¦" beat. Talks to MissionVerificationService
+ * only through its interface â€” no technical AI language is ever
+ * rendered here, per master protocol Â§AI VERIFICATION.
  */
 export function VerificationScreen({ mission, photoUri, onApproved, onRetry }: VerificationScreenProps) {
   const [result, setResult] = useState<VerificationResult | null>(null);
@@ -45,7 +46,7 @@ export function VerificationScreen({ mission, photoUri, onApproved, onRetry }: V
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.content}>
         <CompanionReaction mood={result ? (result.outcome === "approved" ? "celebrating" : "curious") : "curious"} size={140} />
-        <Text style={styles.title}>{result ? result.companionLine : "Your Companion is looking closely…"}</Text>
+        <Text style={styles.title}>{result ? result.companionLine : "Your Companion is looking closelyâ€¦"}</Text>
         {result && (
           <PrimaryButton
             label={result.outcome === "approved" ? "Continue" : "Try Again"}
@@ -64,3 +65,4 @@ const styles = StyleSheet.create({
   title: { ...typography.title, color: colors.text.primary, textAlign: "center", marginVertical: spacing.xl },
   cta: { alignSelf: "stretch" },
 });
+

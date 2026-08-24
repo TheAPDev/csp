@@ -1,5 +1,6 @@
-import React from "react";
-import { View, Text, StyleSheet, SafeAreaView } from "react-native";
+﻿import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { AssetImage } from "@components/AssetImage";
 import { CompanionReaction } from "@components/CompanionReaction";
 import { PrimaryButton } from "@components/PrimaryButton";
@@ -13,7 +14,7 @@ interface RewardScreenProps {
 
 /**
  * Rewards are shown as specific icon + amount rows rather than one
- * generic confetti burst for everything, per master protocol §REWARD.
+ * generic confetti burst for everything, per master protocol Â§REWARD.
  */
 export function RewardScreen({ mission, onContinue }: RewardScreenProps) {
   const { reward } = mission;
@@ -62,3 +63,4 @@ const styles = StyleSheet.create({
   rewardText: { ...typography.heading, color: colors.text.primary },
   cta: { alignSelf: "stretch", marginTop: spacing.xl },
 });
+

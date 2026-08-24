@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+﻿import React, { useEffect } from "react";
 import { Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay } from "react-native-reanimated";
 import { colors, typography, spacing, radius, duration, shadows, zIndex } from "@theme";
 
@@ -9,7 +10,7 @@ interface ToastProps {
   onHide?: () => void;
 }
 
-/** Lightweight feedback toast — no error-tone red for child-facing misses. */
+/** Lightweight feedback toast â€” no error-tone red for child-facing misses. */
 export function Toast({ message, visible, onHide }: ToastProps) {
   const opacityValue = useSharedValue(0);
 
@@ -50,3 +51,4 @@ const styles = StyleSheet.create({
   },
   text: { ...typography.label, color: colors.text.primary },
 });
+

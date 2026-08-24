@@ -1,5 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { View, StyleSheet, Modal as RNModal } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, spacing, radius } from "@theme";
 
 interface WonderkinModalProps {
@@ -8,7 +9,7 @@ interface WonderkinModalProps {
   children: React.ReactNode;
 }
 
-/** Centered modal primitive — used for confirmations, reward reveals. */
+/** Centered modal primitive â€” used for confirmations, reward reveals. */
 export function WonderkinModal({ visible, onClose, children }: WonderkinModalProps) {
   return (
     <RNModal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -36,3 +37,4 @@ const styles = StyleSheet.create({
     borderColor: colors.border.subtle,
   },
 });
+

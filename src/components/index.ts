@@ -1,5 +1,6 @@
 /** WONDERKIN Component System — single import surface. Do not duplicate equivalents. */
 export * from "./AssetImage";
+export * from "./AssetVideo";
 export * from "./PrimaryButton";
 export * from "./SecondaryButton";
 export * from "./IconButton";

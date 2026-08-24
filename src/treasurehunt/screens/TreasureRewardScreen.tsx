@@ -1,5 +1,6 @@
-import React from "react";
-import { View, Text, StyleSheet, SafeAreaView } from "react-native";
+﻿import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { AssetImage } from "@components/AssetImage";
 import { PrimaryButton } from "@components/PrimaryButton";
 import { SecondaryButton } from "@components/SecondaryButton";
@@ -16,8 +17,8 @@ interface TreasureRewardScreenProps {
  * Mirrors `missions/screens/RewardScreen.tsx`'s icon + amount row
  * pattern exactly (same layout, same reward icons) rather than
  * inventing a Treasure-Hunt-specific reward language. Two ways
- * forward, both a single clear action — keep exploring, or head home
- * — never a dead end.
+ * forward, both a single clear action â€” keep exploring, or head home
+ * â€” never a dead end.
  */
 export function TreasureRewardScreen({ treasure, onKeepExploring, onReturnToGrove }: TreasureRewardScreenProps) {
   const { reward } = treasure;
@@ -68,3 +69,4 @@ const styles = StyleSheet.create({
   rewardText: { ...typography.heading, color: colors.text.primary },
   cta: { alignSelf: "stretch", marginTop: spacing.md },
 });
+

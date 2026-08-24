@@ -1,5 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { colors, typography, spacing, radius, shadows } from "@theme";
 import { AssetImage } from "@components/AssetImage";
@@ -18,7 +19,7 @@ interface ItemCardProps {
   onPress: () => void;
 }
 
-/** One catalog tile — status badge (owned/equipped) replaces price once purchased. */
+/** One catalog tile â€” status badge (owned/equipped) replaces price once purchased. */
 export function ItemCard({ item, owned, equipped, onPress }: ItemCardProps) {
   return (
     <Pressable
@@ -65,3 +66,4 @@ const styles = StyleSheet.create({
   ownedTag: { ...typography.caption, color: colors.accent.positive },
   equippedTag: { ...typography.caption, color: colors.accent.secondary },
 });
+

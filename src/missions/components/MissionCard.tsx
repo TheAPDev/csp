@@ -1,5 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { View, Text, Pressable, StyleSheet, ImageStyle } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { AssetImage } from "@components/AssetImage";
 import { colors, typography, spacing, radius, shadows } from "@theme";
@@ -44,7 +45,7 @@ export function MissionCard({ mission, status, onPress, variant = "full" }: Miss
             {mission.prompt}
           </Text>
         )}
-        {status === "complete" && <Text style={styles.doneBadge}>Completed ✓</Text>}
+        {status === "complete" && <Text style={styles.doneBadge}>Completed âœ“</Text>}
       </View>
     </Pressable>
   );
@@ -69,3 +70,4 @@ const styles = StyleSheet.create({
   prompt: { ...typography.caption, color: colors.text.secondary, marginTop: spacing.xxs },
   doneBadge: { ...typography.caption, color: colors.accent.primary, marginTop: spacing.xxs },
 });
+

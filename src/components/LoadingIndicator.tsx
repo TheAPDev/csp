@@ -1,5 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "@theme";
 
 export function LoadingIndicator() {
@@ -13,3 +14,4 @@ export function LoadingIndicator() {
 const styles = StyleSheet.create({
   wrap: { flex: 1, alignItems: "center", justifyContent: "center" },
 });
+

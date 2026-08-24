@@ -1,12 +1,13 @@
-import React, { useEffect } from "react";
+﻿import React, { useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { CompanionReaction } from "@components/CompanionReaction";
 import { PrimaryButton } from "@components/PrimaryButton";
 import { colors, typography, spacing } from "@theme";
 import { useOnboardingStore } from "@state/onboardingStore";
 import { useCompanionStore } from "@state/companionStore";
 
-/** The Companion's identity is revealed — earned by the hatching beat that precedes it. */
+/** The Companion's identity is revealed â€” earned by the hatching beat that precedes it. */
 export function CompanionRevealScreen() {
   const advance = useOnboardingStore((s) => s.advance);
   const setMood = useCompanionStore((s) => s.setMood);
@@ -31,3 +32,4 @@ const styles = StyleSheet.create({
   subtitle: { ...typography.body, color: colors.text.secondary, textAlign: "center", marginTop: spacing.sm, marginBottom: spacing.xxl },
   cta: { alignSelf: "stretch" },
 });
+

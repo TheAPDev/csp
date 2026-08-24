@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "@theme";
 import { WorldScene } from "@worlds/WorldScene";
 import { TreasureDefinition } from "@apptypes";
@@ -25,8 +26,8 @@ interface TreasureHuntFlowProps {
 }
 
 /**
- * Orchestrates the full Treasure Hunt journey: entry → camera
- * exploration → discovery/interaction → collection → reward → keep
+ * Orchestrates the full Treasure Hunt journey: entry â†’ camera
+ * exploration â†’ discovery/interaction â†’ collection â†’ reward â†’ keep
  * exploring or return to Grove. Mirrors `MissionsFlow`'s single-
  * owner-of-sequencing pattern and `MissionsFlow.grantReward`'s reward-
  * granting shape (progression + trait nudge + notification +
@@ -43,7 +44,7 @@ export function TreasureHuntFlow({ onReturnToGrove }: TreasureHuntFlowProps) {
   const addCollectorTokens = useProgressionStore((s) => s.addCollectorTokens);
 
   useEffect(() => {
-    // Coarse biome only, resolved once per visit and never surfaced —
+    // Coarse biome only, resolved once per visit and never surfaced â€”
     // see services/location/coarseLocation.ts. Falls back to "meadow"
     // immediately if this hasn't resolved yet, so entry never waits
     // on a permission prompt.
@@ -61,7 +62,7 @@ export function TreasureHuntFlow({ onReturnToGrove }: TreasureHuntFlowProps) {
       traitLean: treasure.traitLean,
       notification: { kind: "reward", message: `Found ${treasure.name}!` },
     });
-    // Best-effort Supabase sync — never blocks the local reward flow.
+    // Best-effort Supabase sync â€” never blocks the local reward flow.
     recordTreasureCollection("local-guest", treasure.id, reward);
   }
 
@@ -123,3 +124,4 @@ export function TreasureHuntFlow({ onReturnToGrove }: TreasureHuntFlowProps) {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background.primary },
 });
+

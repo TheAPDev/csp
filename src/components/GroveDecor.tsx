@@ -1,5 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { View, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { AssetImage } from "./AssetImage";
 import { CompanionLean, groveDecorForLean } from "@companion/evolution";
 import { GroveEvolutionStage } from "@apptypes";
@@ -12,10 +13,10 @@ interface GroveDecorProps {
 
 /**
  * A small, purely decorative pair of Grove ornaments reflecting the
- * Companion's current developmental lean (Ember/Tide/Whisper — see
+ * Companion's current developmental lean (Ember/Tide/Whisper â€” see
  * `@companion/evolution`). Gated by evolution stage rather than
  * shown from the very first visit, so the Grove visibly earns new
- * detail as the child's journey progresses — "this is MY place"
+ * detail as the child's journey progresses â€” "this is MY place"
  * (master protocol, Batch 08 "World Response"). No interaction
  * required, mirroring `GroveAmbient`'s pattern; never labels the
  * lean or explains why it's there.
@@ -44,3 +45,4 @@ const styles = StyleSheet.create({
   decorLeft: { left: 20, bottom: 220 },
   decorRight: { right: 20, bottom: 260 },
 });
+

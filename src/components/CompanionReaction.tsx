@@ -1,5 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { View, StyleSheet, Pressable } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { AssetImage } from "./AssetImage";
 import { AssetId } from "@assets/registry";
@@ -11,7 +12,7 @@ export type CompanionMood =
   | "curious"
   | "sleepy"
   | "celebrating"
-  // Batch 08 additions — the Companion's fuller emotional vocabulary.
+  // Batch 08 additions â€” the Companion's fuller emotional vocabulary.
   // Each is wired to a real trigger site (see companionMoments.ts),
   // not left as an unused enum value.
   | "thinking"
@@ -41,7 +42,7 @@ interface CompanionReactionProps {
   mood: CompanionMood;
   size?: number;
   /**
-   * Optional tap handler — added in Batch 03 so the Grove can make the
+   * Optional tap handler â€” added in Batch 03 so the Grove can make the
    * Companion directly interactive (its center-stage role). Optional
    * and additive: existing callers with no `onPress` are unaffected.
    */
@@ -50,7 +51,7 @@ interface CompanionReactionProps {
 
 /**
  * Renders the Companion's emotional reaction. This is the emotional
- * spine of the product — future batches will attach animation and
+ * spine of the product â€” future batches will attach animation and
  * contextual teaching moments here without changing this contract.
  */
 export function CompanionReaction({ mood, size = 96, onPress }: CompanionReactionProps) {
@@ -79,3 +80,4 @@ export function CompanionReaction({ mood, size = 96, onPress }: CompanionReactio
 const styles = StyleSheet.create({
   wrap: { alignItems: "center", justifyContent: "center" },
 });
+

@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { CameraView } from "expo-camera";
 import * as Haptics from "expo-haptics";
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing } from "react-native-reanimated";
@@ -20,11 +21,11 @@ const MARKER_SIZE = 34;
 /**
  * Camera step of Treasure Hunt. The rear camera feed is the
  * exploration surface; magical markers overlay it at the AR
- * provider's anchor positions (see `services/ar` — currently the
+ * provider's anchor positions (see `services/ar` â€” currently the
  * polished `CameraFallbackARProvider`, swappable for real ARKit/
  * ARCore later with no changes here). Deliberately minimal HUD: one
  * small "Leave" control, one brief Companion line on arrival, and the
- * markers themselves — nothing else.
+ * markers themselves â€” nothing else.
  */
 export function ExplorationScreen({ treasures, onDiscoverTap, onLeave }: ExplorationScreenProps) {
   const [anchors, setAnchors] = useState<ARAnchor[]>([]);
@@ -83,7 +84,7 @@ export function ExplorationScreen({ treasures, onDiscoverTap, onLeave }: Explora
 }
 
 /**
- * Full-screen tap surface, separate from the markers themselves —
+ * Full-screen tap surface, separate from the markers themselves â€”
  * mirrors how a real AR provider's `hitTest` works off raw screen
  * coordinates rather than a hit on a specific rendered node.
  */
@@ -188,3 +189,4 @@ const styles = StyleSheet.create({
   },
   leaveLabel: { ...typography.label, color: colors.text.primary },
 });
+

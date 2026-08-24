@@ -19,6 +19,7 @@ type Phase = "onboarding" | "grove";
 export default function Index() {
   const hasHydrated = useOnboardingStore((s) => s.hasHydrated);
   const completed = useOnboardingStore((s) => s.completed);
+  const forceOnboarding = process.env.EXPO_PUBLIC_FORCE_ONBOARDING === "1" || __DEV__;
 
   const [initialized, setInitialized] = useState(false);
   const [phase, setPhase] = useState<Phase>("onboarding");
@@ -28,10 +29,15 @@ export default function Index() {
   // state has actually loaded — never guess ahead of hydration.
   useEffect(() => {
     if (hasHydrated && !initialized) {
-      setPhase(completed ? "grove" : "onboarding");
+      if (forceOnboarding) {
+        useOnboardingStore.getState().restart();
+        setPhase("onboarding");
+      } else {
+        setPhase(completed ? "grove" : "onboarding");
+      }
       setInitialized(true);
     }
-  }, [hasHydrated, initialized, completed]);
+  }, [hasHydrated, initialized, completed, forceOnboarding]);
 
   if (!hasHydrated || !initialized) {
     return <LoadingIndicator />;
