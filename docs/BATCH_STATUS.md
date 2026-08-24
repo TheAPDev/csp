@@ -931,3 +931,171 @@ the repository.
   identity threading (every World still writes with a `"local-guest"`
   placeholder), or a final integration/QA pass — flag which to the
   user rather than assuming.
+
+---
+
+## Batch 10 — Final Productization Audit
+
+**Status: BUILT LOCALLY. Tested. Awaiting explicit "YES, PUSH"
+approval, per this batch's own explicit instruction not to push
+without it.**
+
+This was a global audit + fix + documentation batch, not a
+feature-expansion batch, per its own instructions. Batches 01–09 were
+merged first (see below), then audited as a whole.
+
+### Merge performed first
+
+`batch-09-the-beyond` existed as a pushed-but-unmerged branch. Fast-
+forward merged into local `main` (`f4c78c3` → `8748dac`) so this audit
+covers all 9 batches, not 8. **Not pushed yet** — bundled with this
+batch's own approval gate, since pushing the merge is itself a remote
+change requiring the same "YES, PUSH" this batch explicitly withholds
+until asked.
+
+### Global audit — what was checked
+
+- **Design lint** (one primary action / no clutter / ≤1 ambient loop
+  at rest / sound-off understandable / no grading / consistent visual
+  language): read `Grove.tsx` in full against the checklist — passes.
+  Repo-wide `grep` for `withRepeat` (continuous animation loops)
+  confirms **exactly one** exists anywhere in the app
+  (`GroveAmbient`), not two competing "alive" layers.
+- **One World Test**: `WorldRegistry` confirmed to list exactly 7
+  Worlds; every `worlds/worlds/*.tsx` entry file exists and is thin
+  (just renders that World's Flow orchestrator); every non-Grove World
+  imports and uses `ReturnToGrove` (grepped, confirmed for all 6).
+- **Design token discipline**: repo-wide grep for raw hex colors
+  outside `src/theme/` — zero results. Repo-wide grep for `require(`
+  outside `src/assets/registry.ts` — zero results (every image
+  reference across all 155 source files goes through the `AssetId`
+  system, confirming the Asset Replacement Rule actually holds, not
+  just documented as holding).
+- **Accessibility**: audited every `Pressable` in the app (22 total).
+  Found 2 missing `accessibilityRole`/`accessibilityLabel` on
+  `MissionsHomeScreen`'s category/length filter chips — **fixed**,
+  now also carry `accessibilityState.selected` for the active filter.
+- **Mobile QA (camera/permissions)**: read `CameraCaptureScreen.tsx`
+  and the shared `CameraPermissionGate` — denied/can't-ask-again/
+  capture-failure are all handled with in-world, non-technical copy.
+  Confirmed Treasure Hunt reuses the same gate rather than a parallel
+  permission flow.
+- **Mobile QA (AI/network failure)**: read `VerificationScreen.tsx`
+  and `MissionVerificationService`. Found a real gap: if the
+  verification promise never resolves, the screen has no timeout and
+  would sit on "Your Companion is looking closely…" indefinitely.
+  Today's mock always resolves so this has never surfaced, but a real
+  backend will occasionally hang. **Documented, not fixed** — see
+  rationale below.
+- **Persistence**: confirmed 9 of 10 Zustand stores use `persist`
+  (AsyncStorage); `profileStore` is the one exception, and it's also
+  the one Batch 09 already flagged as dead code — consistent finding,
+  not a new gap.
+- **Build config**: `app.json` referenced
+  `src/assets/images/icon-placeholder.png`, which **did not exist**
+  (the directory only had a `.gitkeep`). This never surfaced in
+  `expo export` (which doesn't validate the icon path) but would have
+  broken a real `eas build`/`expo prebuild`. **Fixed**: generated a
+  real, theme-matching (`#0B1026` / `#7C6FE0`) placeholder PNG at that
+  exact path.
+- **Tooling**: `npm run lint` is completely non-functional — no
+  ESLint config file exists anywhere in the repo, and `eslint` isn't
+  even a listed `devDependency`. No prior batch ever actually ran it;
+  `tsc` + bundle export have been the only automated checks across
+  all 10 batches. **Documented, not fixed** — see rationale below.
+
+### Why the failure-timeout and lint gaps were documented, not fixed
+
+Both are real. Both are also the kind of change a "final
+productization" audit should surface for a decision, not rush a fix
+for inside the same pass that found them:
+
+- A verification timeout needs a real design decision (how long to
+  wait, what the Companion says on timeout, whether it auto-retries)
+  — inventing that unilaterally risks a UX choice nobody reviewed,
+  for a path that is currently unreachable (the mock never hangs).
+- An ESLint config is a real set of rule choices (React Native
+  conventions, import-order, etc.) that deserves its own review, not
+  a default config bolted on inside a QA batch already touching many
+  other files.
+
+Both are called out explicitly, with exact locations, in
+`docs/KNOWN_LIMITATIONS.md` so they can't be silently missed by a
+future batch or a human reviewer.
+
+### Final documentation created
+
+- **`docs/FINAL_ARCHITECTURE.md`** — stack, directory map, the
+  one-World system, the one-store-per-concept state model, Supabase
+  reality (schema real, auth identity stubbed), asset system, and a
+  per-World "what does 'done' mean" table.
+- **`docs/KNOWN_LIMITATIONS.md`** — full 🟢/🟡/⚪/🔴
+  (production-ready / mocked / placeholder / external-integration-
+  required) status table covering the app shell, auth, AI
+  verification, AR, location, content, accessibility, and testing —
+  including the two gaps found this batch and the `profileStore` dead
+  code Batch 09 flagged.
+- **`docs/ASSET_REPLACEMENT_GUIDE.md`** — the exact swap procedure
+  (with the verified zero-`require()`-outside-registry claim backing
+  it), a suggested replacement priority order across the 97 registered
+  `AssetId`s, and an explicit list of what replacing art does NOT
+  require touching (navigation/logic/state/DB/component contracts).
+- **`docs/DEPLOYMENT_GUIDE.md`** — what's confirmed working
+  (`tsc`/bundle/config-resolution), what's never been tested (a real
+  device, a live Supabase project, EAS Build), a numbered path to a
+  real running build, and the environment-variable story (already
+  done correctly via `.env.example` + `services/supabase/client.ts` —
+  verified, not assumed).
+- **`docs/WONDERKIN_CONTINUITY.md`** and this file — updated with the
+  Batch 10 findings (see continuity doc §31/§32).
+
+### Testing performed
+
+- `npm install` — clean.
+- `npx tsc --noEmit` — **0 errors**, both before and after this
+  batch's fixes.
+- `npx expo export --platform android` — clean, 1345 modules.
+- `npx expo export --platform ios` — clean, ~1347 modules (first time
+  this platform target has been explicitly verified in any batch).
+- `npx expo config --type public` — resolves cleanly, including
+  plugin-derived Android permissions matching `app.json`'s declared
+  plugins (camera, audio, coarse+fine location).
+- `npx expo-doctor` — 14/17, same 3 sandbox-network-only failures as
+  every prior batch.
+- Build artifacts (`dist/`, `.expo/`) removed before commit.
+
+### Explicitly deferred / out of scope (per this batch's own DO NOT list)
+
+- Parent Space — explicitly forbidden this batch ("Do not add Parent
+  Space").
+- Any new feature — explicitly forbidden ("Do not add random new
+  features").
+- A rewrite of any working system, a second design system, or a
+  framework change — none occurred; every fix this batch was a
+  targeted, small, verifiable correction (icon file, 2 accessibility
+  props) or a documentation artifact.
+- Fixing the verification-timeout gap and the missing ESLint config —
+  deliberately left as documented findings, not code changes (see
+  rationale above).
+- Real device testing, a live Supabase project, and EAS Build — none
+  are possible in this sandbox; `DEPLOYMENT_GUIDE.md` documents
+  exactly what's left for whoever does have those.
+
+### Push status
+
+**NOT pushed.** This includes the Batch 09 merge, which was performed
+locally as a prerequisite for this audit but also withheld from the
+remote — per this batch's explicit "Do not push without explicit
+'YES, PUSH'" instruction, restated even more directly than prior
+batches' general approval-gate language. Awaiting that explicit
+approval before any commit/push to the repository.
+
+### If/when "YES, PUSH" is given
+
+The push should include, in this order: (1) the already-approved-in-
+spirit Batch 09 merge (the user separately confirmed "batch 1–9
+done"), then (2) this batch's fixes + new documentation as one
+commit on top. Flag to the user that this is two logical changes
+landing together and confirm that's intended before pushing, since
+Batch 09's merge was never individually approved with an explicit
+"YES, PUSH" of its own — only referenced as already-complete context.

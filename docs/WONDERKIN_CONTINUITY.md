@@ -1066,3 +1066,86 @@ per the master protocol's explicit list.
 - Parent Space, Store, a second visual theme, real per-profile
   Supabase identity (still the `"local-guest"` placeholder) — all
   unchanged from every prior batch's deferral list.
+
+## 31. Final Productization Audit — Batch 10
+
+Batch 10 was explicitly not a feature batch — it audited Batches
+01–09 as a whole and produced the four ship-readiness documents now
+living in `docs/`: `FINAL_ARCHITECTURE.md`, `KNOWN_LIMITATIONS.md`,
+`ASSET_REPLACEMENT_GUIDE.md`, `DEPLOYMENT_GUIDE.md`. Read those for
+the full picture — this section only records what changed in `src/`
+and what the audit confirmed vs. found broken.
+
+### Confirmed holding (verified, not assumed)
+
+- **Design token discipline**: zero raw hex colors outside
+  `src/theme/`, zero `require()` calls outside
+  `src/assets/registry.ts`, across all 155 source files.
+- **One World Test**: all 7 Worlds correctly registered, all 6
+  non-Grove Worlds use `ReturnToGrove` consistently.
+- **One ambient animation loop at rest**: repo-wide `withRepeat` grep
+  returns exactly one hit (`GroveAmbient`) — the Grove has never
+  accumulated a second competing "alive" layer across 9 batches of
+  independent work.
+- **Environment variables**: already handled correctly since Batch 01
+  (`services/supabase/client.ts` reads `process.env`, `.env.example`
+  documents the two required keys) — the Deployment Guide originally
+  drafted a claim that this was missing; corrected after checking the
+  actual file.
+
+### Fixed this batch
+
+- `app.json`'s icon path
+  (`src/assets/images/icon-placeholder.png`) pointed at a file that
+  didn't exist (only a `.gitkeep` was present). A real, theme-colored
+  (`#0B1026` background / `#7C6FE0` accent) placeholder PNG now exists
+  there. This is a **real fix**, not a placeholder-for-a-placeholder —
+  it makes `app.json` internally consistent; swapping in a final icon
+  later still just replaces this one file, per the Asset Replacement
+  Rule.
+- `MissionsHomeScreen`'s category and length filter chips were missing
+  `accessibilityRole`/`accessibilityLabel`/`accessibilityState` — now
+  match every other interactive element's accessibility baseline in
+  the app.
+
+### Found and documented, deliberately not fixed
+
+- `VerificationScreen` has no timeout if `MissionVerificationService`
+  never resolves. Unreachable today (the mock always resolves) but
+  will matter the moment a real backend replaces the mock. A future
+  batch adding a real verification backend should design the
+  timeout/failure Companion copy at the same time, not retrofit it —
+  see `KNOWN_LIMITATIONS.md`.
+- `npm run lint` has no ESLint config anywhere in the repo and
+  `eslint` isn't a `devDependency` — has been non-functional since
+  Batch 01, only surfaced by this batch actually trying to run it.
+  Adding a real config is a rules decision that deserves its own
+  review pass, not a default bolted on inside a QA batch.
+
+### Rule for future batches
+
+Both of the above are exactly the kind of finding this continuity doc
+exists to prevent from being silently rediscovered: check
+`docs/KNOWN_LIMITATIONS.md` before assuming either gap is new, and
+update that file (not just this one) if either is ever actually
+addressed.
+
+## 32. What Batch 10 Explicitly Did NOT Do
+
+Per its own DO NOT list:
+
+- No Parent Space (explicitly forbidden this batch, despite
+  `redemption_requests` data waiting since Batch 07).
+- No new features of any kind.
+- No rewrite, no second design system, no framework change — every
+  code change this batch was a small, independently-verifiable fix
+  (2 files touched: `app.json`'s referenced icon + `MissionsHomeScreen`).
+- No fix for the verification-timeout gap or the missing ESLint
+  config — documented as findings, deliberately not code-fixed (see
+  §31 rationale).
+- No real device testing, no live Supabase project exercised, no EAS
+  Build invoked — none are possible in this sandbox; documented as
+  exactly what's left in `DEPLOYMENT_GUIDE.md`.
+- No push to the remote — including the Batch 09 merge, which was
+  performed locally as a audit prerequisite but held back pending
+  explicit "YES, PUSH," per this batch's own restated instruction.

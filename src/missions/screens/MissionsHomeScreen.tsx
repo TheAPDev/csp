@@ -71,6 +71,9 @@ export function MissionsHomeScreen({ onSelectMission, onOpenHistory, onReturnToG
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 setCategoryFilter(c);
               }}
+              accessibilityRole="button"
+              accessibilityLabel={c === "all" ? "All categories" : categoryLabel[c]}
+              accessibilityState={{ selected: categoryFilter === c }}
               style={[styles.chip, categoryFilter === c && styles.chipActive]}
             >
               <Text style={[styles.chipLabel, categoryFilter === c && styles.chipLabelActive]}>
@@ -85,6 +88,9 @@ export function MissionsHomeScreen({ onSelectMission, onOpenHistory, onReturnToG
             <Pressable
               key={l}
               onPress={() => setLengthFilter(l)}
+              accessibilityRole="button"
+              accessibilityLabel={l === "all" ? "All lengths" : l === "quick" ? "Quick Quests" : "Long Quests"}
+              accessibilityState={{ selected: lengthFilter === l }}
               style={[styles.lengthPill, lengthFilter === l && styles.lengthPillActive]}
             >
               <Text style={[styles.lengthLabel, lengthFilter === l && styles.lengthLabelActive]}>
