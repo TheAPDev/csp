@@ -1083,10 +1083,20 @@ and what the audit confirmed vs. found broken.
   `src/assets/registry.ts`, across all 155 source files.
 - **One World Test**: all 7 Worlds correctly registered, all 6
   non-Grove Worlds use `ReturnToGrove` consistently.
-- **One ambient animation loop at rest**: repo-wide `withRepeat` grep
-  returns exactly one hit (`GroveAmbient`) — the Grove has never
-  accumulated a second competing "alive" layer across 9 batches of
-  independent work.
+- **One ambient animation loop at rest, per screen**: verified via a
+  true repo-wide `withRepeat` grep (the Batch 10 audit's original
+  claim of "exactly one hit anywhere in the app" was based on a grep
+  that only covered `components/`, `worlds/worlds/`, and `state/` —
+  incomplete, corrected here). The accurate picture: 5 files use
+  `withRepeat`, each for exactly one purpose-built loop scoped to its
+  own screen and gated to only run when relevant — `GroveAmbient`
+  (Grove's ambient motes), `EpisodeCard`/`BeyondRegionCard` (shimmer,
+  gated to `!available` — only sealed cards shimmer), and
+  `ExplorationScreen`/`RegionExplorationScreen` (Treasure Hunt marker
+  pulse / Beyond point-of-interest pulse, gated to `!discovered`).
+  No screen has more than one *kind* of ambient loop running
+  simultaneously — the design-lint rule holds, but "exactly one loop
+  in the whole app" was never the correct description of it.
 - **Environment variables**: already handled correctly since Batch 01
   (`services/supabase/client.ts` reads `process.env`, `.env.example`
   documents the two required keys) — the Deployment Guide originally

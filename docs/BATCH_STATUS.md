@@ -958,9 +958,15 @@ until asked.
 - **Design lint** (one primary action / no clutter / ≤1 ambient loop
   at rest / sound-off understandable / no grading / consistent visual
   language): read `Grove.tsx` in full against the checklist — passes.
-  Repo-wide `grep` for `withRepeat` (continuous animation loops)
-  confirms **exactly one** exists anywhere in the app
-  (`GroveAmbient`), not two competing "alive" layers.
+  A true repo-wide `grep` for `withRepeat` (continuous animation
+  loops) — corrected in a later follow-up check after this batch's
+  original grep only covered 3 of ~15 `src/` subdirectories — finds 5
+  files, each with exactly one purpose-built, screen-scoped loop
+  (Grove's ambient motes; two sealed-card shimmers gated to
+  `!available`; two discovery-marker pulses gated to `!discovered` in
+  Treasure Hunt and The Beyond). No screen ever runs more than one
+  kind of ambient loop at once — see the corrected note in
+  `WONDERKIN_CONTINUITY.md` §31 for the exact correction.
 - **One World Test**: `WorldRegistry` confirmed to list exactly 7
   Worlds; every `worlds/worlds/*.tsx` entry file exists and is thin
   (just renders that World's Flow orchestrator); every non-Grove World
