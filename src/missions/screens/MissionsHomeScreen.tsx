@@ -8,6 +8,7 @@ import { MissionDefinition, MissionCategory, QuestLength } from "@apptypes";
 import { missionDefinitions, categoryLabel } from "../content/missionDefinitions";
 import { MissionCard } from "../components/MissionCard";
 import { useMissionsStore } from "@state/missionsStore";
+import { ReturnToGrove } from "@components/ReturnToGrove";
 
 interface MissionsHomeScreenProps {
   onSelectMission: (mission: MissionDefinition) => void;
@@ -123,9 +124,7 @@ export function MissionsHomeScreen({ onSelectMission, onOpenHistory, onReturnToG
           <Text style={styles.empty}>No quests match right now — try a different filter.</Text>
         )}
 
-        <Pressable onPress={onReturnToGrove} style={styles.groveLink}>
-          <Text style={styles.groveLinkLabel}>← Back to The Grove</Text>
-        </Pressable>
+        <ReturnToGrove onPress={onReturnToGrove} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -166,6 +165,4 @@ const styles = StyleSheet.create({
   sectionTitle: { ...typography.heading, color: colors.text.primary, marginBottom: spacing.sm },
   quickRow: { gap: spacing.sm },
   empty: { ...typography.body, color: colors.text.secondary, textAlign: "center", marginTop: spacing.xl },
-  groveLink: { marginTop: spacing.lg, alignItems: "center" },
-  groveLinkLabel: { ...typography.label, color: colors.text.secondary },
 });

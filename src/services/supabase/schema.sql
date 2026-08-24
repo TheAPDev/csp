@@ -181,6 +181,29 @@ alter table mission_submissions enable row level security;
 alter table mission_rewards enable row level security;
 alter table treasure_collections enable row level security;
 
+-- ============================================================
+-- Batch 09 — The Beyond
+-- ============================================================
+
+-- One row per region completion. Mirrors treasure_collections'
+-- log-not-flag shape exactly (see WONDERKIN_CONTINUITY §11) — a
+-- region is only ever granted its reward once client-side
+-- (beyondStore.completions), but the log itself follows the same
+-- established shape as every other reward-granting World.
+create table if not exists beyond_region_completions (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid references profiles(id) on delete cascade,
+  region_id text not null,
+  xp int not null default 0,
+  coins int not null default 0,
+  adventure_tickets int not null default 0,
+  collector_tokens int not null default 0,
+  completed_at timestamptz not null default now()
+);
+
+alter table beyond_region_completions enable row level security;
+create policy "Own beyond region completions" on beyond_region_completions for all using (auth.uid() = profile_id);
+
 create policy "Public read mission definitions" on mission_definitions for select using (true);
 create policy "Own mission submissions" on mission_submissions for all using (auth.uid() = profile_id);
 create policy "Own mission rewards" on mission_rewards for all using (auth.uid() = profile_id);

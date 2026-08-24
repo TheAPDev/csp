@@ -128,7 +128,13 @@ export type AssetId =
   | "VAULT_REWARD_STARGAZER_KIT"
   | "VAULT_REWARD_COMPANION_PLUSH"
   | "REWARD_PURCHASE_SPARKLE"
-  | "REWARD_REDEMPTION_GLOW";
+  | "REWARD_REDEMPTION_GLOW"
+  // The Beyond (Batch 09)
+  | "BEYOND_REGION_WHISPERING_DEEP"
+  | "BEYOND_REGION_STARLIT_CROSSING"
+  | "BEYOND_REGION_FORGOTTEN_ARCHIVE"
+  | "BEYOND_REGION_FAR_SHORE"
+  | "BEYOND_REGION_EMBER_HOLLOW";
 
 export type AssetKind = "image" | "audio";
 
@@ -248,6 +254,13 @@ export const assetRegistry: Record<AssetId, AssetEntry> = {
   VAULT_REWARD_COMPANION_PLUSH: { kind: "image", source: null },
   REWARD_PURCHASE_SPARKLE: { kind: "image", source: null },
   REWARD_REDEMPTION_GLOW: { kind: "image", source: null },
+
+  // The Beyond (Batch 09)
+  BEYOND_REGION_WHISPERING_DEEP: { kind: "image", source: null },
+  BEYOND_REGION_STARLIT_CROSSING: { kind: "image", source: null },
+  BEYOND_REGION_FORGOTTEN_ARCHIVE: { kind: "image", source: null },
+  BEYOND_REGION_FAR_SHORE: { kind: "image", source: null },
+  BEYOND_REGION_EMBER_HOLLOW: { kind: "image", source: null },
 };
 
 export function getAsset(id: AssetId): AssetEntry {

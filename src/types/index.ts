@@ -294,3 +294,32 @@ export interface RedemptionRequest {
   status: RedemptionStatus;
   requested_at: string;
 }
+
+/** WONDERKIN Shared Types — The Beyond (Batch 09) */
+
+/** Loose content flavor for a Beyond region — affects only the small badge shown on a sealed card. */
+export type BeyondRegionKind = "region" | "quest" | "seasonal" | "premium";
+
+export interface BeyondPointOfInterest {
+  id: string;
+  /** Fractional position (0..1) over the region's background art. */
+  x: number;
+  y: number;
+  /** Companion/narrator line revealed on discovery. */
+  line: string;
+}
+
+export interface BeyondRegionDefinition {
+  id: string;
+  title: string;
+  kind: BeyondRegionKind;
+  cardAssetId: import("@assets/registry").AssetId;
+  /** Shown on both available and sealed cards — sealed cards use it as the whole story, no separate "locked" copy needed. */
+  teaser: string;
+  /** True once this region has real interactive content this batch. */
+  available: boolean;
+  points?: BeyondPointOfInterest[];
+  reward?: MissionReward;
+  /** Optional cosmetic/collectible unlock, logged via services/supabase/inventory.ts on completion. */
+  unlockAssetId?: string;
+}

@@ -19,6 +19,7 @@ module.exports = function (api) {
       "@treasurehunt": "./src/treasurehunt",
       "@closet": "./src/closet",
       "@vault": "./src/vault",
+      "@beyond": "./src/beyond",
       "@companion": "./src/companion",
             "@assets": "./src/assets",
             "@navigation": "./src/navigation",

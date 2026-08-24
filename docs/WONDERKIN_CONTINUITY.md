@@ -276,6 +276,22 @@ Store) will extend in later batches, not a finished nav system.
   current trait values, never stored, never rendered as a label,
   chart, or score anywhere in the UI. Do not persist a "lean"/
   "disposition" field or expose it in any child-facing copy (Batch 08).
+- `ReturnToGrove` is the ONLY "way home" affordance any World screen
+  renders — a screen must not build its own inline link/button that
+  merely looks similar. (Batch 09 found and fixed exactly one
+  violation of this in Missions' home screen — see §29.)
+- `inventory_items` (Batch 01's table) is the one general-purpose
+  unlockable-collectible log — a future World with its own unlockable
+  content should log to it via `services/supabase/inventory.ts`
+  rather than creating a fourth parallel "inventory" concept
+  alongside it, `cosmetic_inventory` (Closet), and `ownedItemIds`
+  (`closetStore`) (Batch 09).
+- `profileStore`'s `progression`/`currencies` fields are dead
+  scaffolding from Batch 01 — `progressionStore` is the only real
+  source of truth for XP/level/currencies. Do not start writing to
+  `profileStore.progression`/`currencies`; if profile-synced
+  progression is ever needed, sync FROM `progressionStore` INTO
+  Supabase, not through this unused mirror (Batch 09).
 
 If a later batch believes one of these must change, **stop and ask
 the user** rather than redesigning silently, per the master protocol's
@@ -894,3 +910,159 @@ same logic.
   onboarding's hatching (stage-independent) plus the existing 3 Grove
   stages; a 4th/5th stage is a natural follow-up, not built here to
   avoid inventing thresholds with no gameplay yet to justify them.
+
+## 29. The Beyond & Full World Connectivity / State Audit — Batch 09
+
+The seventh and final placeholder World gets real content, and this
+batch's second half is a genuine audit of everything built so far —
+not a new feature.
+
+### The Beyond (`src/beyond/`)
+
+Same single-owner-of-sequencing `Flow` pattern as every other World
+(`BeyondFlow.tsx`: browse → explore → complete → browse).
+
+- **Content** (`beyond/content/regions.ts`) — 5 `BeyondRegionDefinition`s
+  covering all four categories the master protocol names (`region`,
+  `quest`, `seasonal`, `premium`). Only `whispering-deep` is
+  `available: true` — a real interactive region with 3 tappable
+  points of interest. The other 4 demonstrate sealed content across
+  every category, so The Beyond reads as one expansive, half-open
+  place rather than a single lonely feature with some grey boxes
+  around it.
+- **Sealed regions reuse Tale Trails' exact shimmer-card language**
+  (`beyond/components/BeyondRegionCard.tsx` mirrors
+  `taletrails/components/EpisodeCard.tsx`'s shimmer + in-world copy
+  pattern, plus a small `kindLabel` pill for region/quest/seasonal/
+  premium flavor) — not a new "Coming Soon" visual language. Tapping
+  one never dead-ends: it triggers the same Companion `Toast` tease
+  pattern `TaleTrailsFlow` established, never a navigation.
+- **Interactive region exploration** (`RegionExplorationScreen.tsx`) —
+  a full-bleed background with a handful of glowing, pulsing points of
+  interest (reusing the exact jewel-glow language `WorldGateway`/
+  Treasure Hunt markers already use — `shadows.glow` /
+  `colors.accent.secondary`), each revealing one Companion/narrator
+  line via `Dialogue` on tap. Deliberately NOT built on the
+  `ARSessionProvider`/camera abstraction from Batch 06 — Beyond
+  regions are an in-world map surface, not a camera/AR surface, so
+  this is a genuinely different interaction modality rather than a
+  competing implementation of the same one. No counters, coordinates,
+  or HUD numbers, matching Treasure Hunt's discovery-screen rule even
+  though the mechanism differs.
+- **`state/beyondStore.ts`** — local-first, persisted: discovered
+  point-of-interest ids per region, plus a capped completion history
+  (same shape/philosophy as `missionsStore`/`storiesStore`/
+  `treasureHuntStore`). A region's reward is only ever granted on its
+  *first* completion (`BeyondFlow` checks `completions` before
+  granting) — revisiting an already-explored region still lets the
+  child walk through it again (points stay marked discovered), just
+  without a second reward, so nothing here can be farmed.
+- **Rewards reuse the exact established mechanism**: `progressionStore`
+  add-currency actions, `triggerCompanionMoment("beyond", ...)` (one
+  new `CompanionMomentKind`, mapped to the existing `rewardReaction`
+  mood — no new `CompanionMood` needed), and `RewardBadge` (the same
+  component Missions/Tale Trails use) in `RegionCompleteScreen.tsx`.
+- **Unlockable content reuses `inventory_items` (Batch 01) for real,
+  for the first time.** That table existed since Batch 01 with zero
+  actual callers; `whispering-deep`'s completion is the first thing in
+  the whole app to call `services/supabase/inventory.ts`'s
+  `addInventoryItem`. This was a deliberate audit fix, not incidental
+  — see the STATE AUDIT section below.
+- **Supabase**: new `beyond_region_completions` table, shaped to
+  exactly mirror `treasure_collections` (RLS-scoped, log-not-flag).
+  `services/supabase/beyond.ts` is best-effort/fire-and-forget, same
+  as every other reward-logging service.
+- **World transition**: Grove ↔ The Beyond already resolved to
+  `portal` in / `fade` out via Batch 03's `transitionVariantFor` — no
+  navigation code changed for this batch, confirming the mapping
+  really was complete already.
+- New `@beyond` path alias. 5 new placeholder-safe asset IDs (one per
+  region card).
+
+### World Connectivity Audit — findings
+
+Checked every World against Grove for: reachability (`WorldGateway`
+entry exists), a working way back (`ReturnToGrove`), and a resolved
+`transitionVariantFor` mapping both directions.
+
+- **All 6 non-Grove Worlds** (missions, taleTrails, treasureHunt,
+  theBeyond, closet, vault) were already correctly gatewayed from
+  Grove and had a resolved transition variant both ways (the "world →
+  grove" default case correctly covers treasureHunt/theBeyond/vault as
+  `fade`, matching the code comments documenting that intent — this
+  was a correct implicit default, not a gap).
+- **Found and fixed one real inconsistency**: `MissionsHomeScreen`
+  had its own inline "← Back to The Grove" text link instead of the
+  shared `ReturnToGrove` component every other World uses — the only
+  World that didn't visually match. Fixed to use `ReturnToGrove`
+  directly.
+- **Reviewed, not changed**: `TreasureRewardScreen` renders "Return to
+  the Grove" via its own `SecondaryButton` call rather than importing
+  `ReturnToGrove` — but the rendered output (same component, same
+  label) is already pixel-identical; it's positioned in a stacked
+  two-button layout where `ReturnToGrove`'s own hardcoded margin
+  styling would need overriding anyway. Left as-is: this is not a
+  design inconsistency, just a different call site producing the same
+  visual result.
+
+### State Audit — findings
+
+Checked for competing sources of truth in XP, level, currency,
+inventory, Companion state, mission completion, and story progress,
+per the master protocol's explicit list.
+
+- **XP / level / currencies**: single source of truth confirmed —
+  `progressionStore` everywhere (Missions, Tale Trails, Treasure Hunt,
+  Closet, Vault, Beyond, Grove's `StatusHub`). No duplicate balance
+  ever found.
+- **Companion state**: single source of truth confirmed —
+  `companionStore` (mood, traits, name), always mutated through
+  `nudgeTrait`/`setMood` or (since Batch 08) `triggerCompanionMoment`.
+- **Per-World completion tracking**: `missionsStore`, `storiesStore`,
+  `treasureHuntStore`, now `beyondStore` — four independent stores,
+  correctly so (a Mission's completion and a Story's completion are
+  genuinely different facts), all following the identical shape/
+  pattern. Not a duplication problem — this is "one store per concept,"
+  not "multiple stores for one concept."
+- **Found one latent risk, fixed**: `profileStore.ts` (Batch 01) has
+  `progression`/`currencies` fields that mirror exactly what
+  `progressionStore` already owns, but grepping the entire codebase
+  confirmed **zero** reads or writes to them anywhere outside their
+  own file's definition. Not an active bug today, but a real landmine
+  — a future session could plausibly start writing progression there,
+  thinking it's live state, creating a genuine second source of truth.
+  Documented in §11 rather than deleted outright this batch (the
+  fields are harmless dead code today; removing them is a one-line
+  follow-up if a future batch wants to tidy it, but doing so wasn't
+  load-bearing for The Beyond and this batch's budget went to
+  documenting the risk clearly enough that no one accidentally builds
+  on it).
+- **Found one duplication risk, resolved by reuse rather than
+  refactor**: `inventory_items` (Batch 01, generic, always empty) vs.
+  `cosmetic_inventory` (Batch 07, Closet-specific, actually used) vs.
+  `closetStore.ownedItemIds` (client-local) looked like three
+  competing "inventory" shapes. Resolution: `inventory_items` was
+  simply unused, not conflicting — Batch 09 gave it its first real
+  purpose (Beyond's unlockable collectibles) rather than adding a
+  fourth shape, which is what "refactor only when necessary" means
+  here: the necessary fix was *using* the existing architecture, not
+  restructuring it.
+
+## 30. What Batch 09 Explicitly Did NOT Implement
+
+- Real native ARKit/ARCore or any camera/AR surface for The Beyond —
+  intentionally a different (map-tap) interaction modality, not an
+  extension of Treasure Hunt's AR abstraction.
+- More than one real interactive region — `starlit-crossing`,
+  `forgotten-archive`, `the-far-shore`, and `ember-hollow` are
+  polished sealed content only, per the batch's own "polished dummy
+  content where necessary" instruction.
+- Deleting `profileStore`'s dead `progression`/`currencies` fields —
+  flagged as a landmine in §11/§29 but left in place; a genuine
+  cleanup a future batch can do in one line if desired.
+- Any change to `TreasureRewardScreen`'s `ReturnToGrove`-equivalent
+  button — reviewed and judged not to be an actual inconsistency (see
+  §29).
+- Parent Space, Store, a second visual theme, real per-profile
+  Supabase identity (still the `"local-guest"` placeholder) — all
+  unchanged from every prior batch's deferral list.

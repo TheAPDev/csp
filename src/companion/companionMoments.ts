@@ -19,7 +19,8 @@ export type CompanionMomentKind =
   | "vaultProgress" // Vault balance moved but reward not yet redeemed
   | "vaultRedeem" // a Vault redemption request was placed
   | "interaction" // a direct tap/pet in the Grove
-  | "reflection"; // a quiet, non-reward beat (e.g. Fireside)
+  | "reflection" // a quiet, non-reward beat (e.g. Fireside)
+  | "beyond"; // a Beyond region is fully explored
 
 const momentMood: Record<CompanionMomentKind, CompanionMood> = {
   quest: "questReaction",
@@ -30,6 +31,7 @@ const momentMood: Record<CompanionMomentKind, CompanionMood> = {
   vaultRedeem: "celebrating",
   interaction: "interaction",
   reflection: "reflective",
+  beyond: "rewardReaction",
 };
 
 interface CompanionMomentOptions {

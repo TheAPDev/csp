@@ -1,36 +1,16 @@
 import React from "react";
-import { Text, StyleSheet, SafeAreaView } from "react-native";
-import { WorldScene } from "@worlds/WorldScene";
-import { worldRegistry, WorldId } from "@worlds/WorldRegistry";
-import { typography, colors, spacing } from "@theme";
-import { ReturnToGrove } from "@components/index";
+import { WorldId } from "@worlds/WorldRegistry";
+import { BeyondFlow } from "@beyond/BeyondFlow";
 
 interface TheBeyondWorldProps {
   onNavigateToWorld?: (world: WorldId) => void;
 }
 
 /**
- * Placeholder World screen for "TheBeyond". Scaffolding only — full
- * gameplay for this World is out of scope for Batch 03 per the
- * master rule (DO NOT implement full Missions/Stories/AR/Store).
- * Reachable only via its Grove gateway (see WorldGateway) — the
- * bottom tab bar no longer switches between the five main Worlds.
+ * The Beyond World entry point (Batch 09). Renders the full Beyond
+ * system via `BeyondFlow` — reachable only through its Grove gateway
+ * (portal transition), same as every other World.
  */
 export default function TheBeyondWorld({ onNavigateToWorld }: TheBeyondWorldProps) {
-  const def = worldRegistry.theBeyond;
-  return (
-    <WorldScene backgroundAssetId={def.backgroundAssetId}>
-      <SafeAreaView style={styles.safeArea}>
-        <Text style={styles.title}>{def.displayName}</Text>
-        <Text style={styles.subtitle}>Coming in a future batch.</Text>
-        <ReturnToGrove onPress={() => onNavigateToWorld?.("grove")} />
-      </SafeAreaView>
-    </WorldScene>
-  );
+  return <BeyondFlow onReturnToGrove={() => onNavigateToWorld?.("grove")} />;
 }
-
-const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
-  title: { ...typography.title, color: colors.text.primary, margin: spacing.xl },
-  subtitle: { ...typography.body, color: colors.text.secondary, marginHorizontal: spacing.xl },
-});

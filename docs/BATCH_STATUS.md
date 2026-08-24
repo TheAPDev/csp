@@ -825,3 +825,109 @@ the repository.
   be surfaced since Batch 07) should come first; flag this to the user
   rather than assuming, per the same open-question pattern left by
   Batch 05/06/07.
+
+---
+
+## Batch 09 — The Beyond & Full World Connectivity / State Audit
+
+**Status: BUILT LOCALLY. Tested. Awaiting explicit "YES, PUSH" approval.**
+
+### What was built
+
+- **The Beyond** (`src/beyond/`), the seventh and final World to move
+  past its placeholder: 5 regions across all four content categories
+  the master protocol named (region/quest/seasonal/premium). Only
+  "The Whispering Deep" is real interactive content this batch — 3
+  tappable, pulsing points of interest over a full-bleed background,
+  each revealing a Companion/narrator line, no HUD numbers or
+  coordinates. The other 4 regions are beautifully sealed using Tale
+  Trails' exact shimmer-card treatment (never a generic greyed-out
+  box, never a dead tap — tapping one triggers a Companion `Toast`
+  tease, same pattern as Tale Trails' sealed chapters).
+- Region completion reuses the fully established reward mechanism:
+  `progressionStore` (XP/coins/tickets/tokens), `triggerCompanionMoment`
+  (one new `"beyond"` kind, mapped to the existing `rewardReaction`
+  mood — no new Companion mood needed), `RewardBadge` (same component
+  Missions/Tale Trails use). A region's reward is granted only on its
+  genuine first completion — revisiting is still possible (points stay
+  discovered) but doesn't re-grant, so nothing here is farmable.
+- **First real use of the `inventory_items` table** (it's existed
+  since Batch 01 with zero callers) — Beyond's one unlockable
+  collectible logs through `services/supabase/inventory.ts`'s existing
+  `addInventoryItem`, closing a real gap rather than adding a third
+  inventory concept.
+- New `beyond_region_completions` Supabase table (RLS-scoped, mirrors
+  `treasure_collections`' shape exactly). New `@beyond` path alias.
+  5 new placeholder-safe asset IDs.
+- **World Connectivity Audit**: verified every one of the 6 non-Grove
+  Worlds is reachable from Grove, has a working way back, and has a
+  resolved `transitionVariantFor` mapping both directions. Found and
+  fixed one real inconsistency: `MissionsHomeScreen` had its own
+  inline "← Back to The Grove" text link instead of the shared
+  `ReturnToGrove` component every other World uses — fixed to use
+  `ReturnToGrove` directly. Reviewed (and left as-is, since the
+  rendered output is already identical) Treasure Hunt's reward screen,
+  which calls the same underlying `SecondaryButton` directly rather
+  than through the `ReturnToGrove` wrapper.
+- **State Audit**: confirmed XP/level/currencies (`progressionStore`),
+  Companion state (`companionStore`), and each World's own completion
+  tracking (`missionsStore`/`storiesStore`/`treasureHuntStore`/new
+  `beyondStore`) all have exactly one source of truth each, with no
+  competing writers found anywhere in the codebase. Found and
+  documented (not deleted) one latent risk: `profileStore.ts`'s
+  `progression`/`currencies` fields are dead Batch 01 scaffolding with
+  zero readers/writers anywhere else in the app — confirmed via a
+  full-codebase grep — flagged in `WONDERKIN_CONTINUITY.md` §11 as a
+  landmine for a future session rather than silently left for someone
+  to stumble into.
+
+### Testing performed
+
+- `npm install` — succeeded (had to reinstall after switching branches
+  in this session; `expo-location` was missing until then).
+- `npx tsc --noEmit` — **0 errors**.
+- `npx expo export --platform android` — **full Metro bundle
+  succeeded**: 1345 modules compiled with no build errors (up from
+  1336 in Batch 08).
+- Manually traced Grove → every World → back to Grove for all 6
+  non-Grove Worlds, confirming `WorldGateway` entry +
+  `transitionVariantFor` + return affordance all resolve correctly.
+- Manually traced The Beyond's full region flow: home → exploring →
+  (tap all 3 points) → complete → home, and confirmed a second visit
+  to the same region skips re-granting the reward while still letting
+  the child walk through it again.
+- Full-codebase grep confirming `profileStore` has zero external
+  readers/writers, and confirming `inventory_items`/
+  `cosmetic_inventory`/`ownedItemIds` are three intentionally distinct
+  concepts, not competing implementations of one.
+- Build artifacts (`dist/`, `.expo/`) removed before commit.
+
+### Explicitly deferred (per master protocol + this batch's own scope)
+
+- Real native AR/camera for The Beyond — deliberately a different
+  (map-tap) interaction modality from Treasure Hunt's AR abstraction,
+  not an extension of it.
+- More than one real interactive region this batch — 4 of 5 regions
+  are polished sealed content only, per "polished dummy content where
+  necessary."
+- Deleting `profileStore`'s dead fields — flagged, not removed; a
+  one-line cleanup available to a future batch if desired.
+- Parent Space, Store, a second visual theme, real per-profile
+  Supabase identity — unchanged deferral list from every prior batch.
+
+### Push status
+
+**NOT pushed.** Per the approval gate, this batch is complete locally
+and waiting for the user to say "YES, PUSH" before any commit/push to
+the repository.
+
+### Next batch (Batch 10 of 10) should
+
+- Read this file and `WONDERKIN_CONTINUITY.md` first (§29/§30
+  especially).
+- With all 7 Worlds and the full economy now built, Batch 10 is a
+  natural place for final polish: Parent Space (redemption-request
+  data has been waiting since Batch 07), real per-profile Supabase
+  identity threading (every World still writes with a `"local-guest"`
+  placeholder), or a final integration/QA pass — flag which to the
+  user rather than assuming.
