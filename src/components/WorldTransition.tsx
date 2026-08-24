@@ -40,13 +40,18 @@ export function WorldTransition({ active, onComplete, variant = "fade" }: WorldT
   useEffect(() => {
     if (!active) return;
     const half = duration.worldTransition / 2;
+
     progress.value = withSequence(
       withTiming(1, { duration: half, easing: Easing.out(Easing.cubic) }),
-      withTiming(0, { duration: half, easing: Easing.in(Easing.cubic) }, (finished) => {
-        if (finished && onComplete) onComplete();
-      })
+      withTiming(0, { duration: half, easing: Easing.in(Easing.cubic) })
     );
-  }, [active]);
+
+    const timer = setTimeout(() => {
+      onComplete?.();
+    }, duration.worldTransition);
+
+    return () => clearTimeout(timer);
+  }, [active, onComplete]);
 
   const fadeStyle = useAnimatedStyle(() => ({ opacity: progress.value }));
 

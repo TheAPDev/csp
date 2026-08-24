@@ -2,32 +2,83 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "ignoreDeprecations": "5.0",
     "baseUrl": ".",
     "paths": {
-      "@theme": ["src/theme/index"],
-      "@theme/*": ["src/theme/*"],
-      "@components": ["src/components/index"],
-      "@components/*": ["src/components/*"],
-      "@transitions": ["src/transitions/index"],
-      "@transitions/*": ["src/transitions/*"],
-      "@worlds/*": ["src/worlds/*"],
-      "@story": ["src/story/index"],
-      "@story/*": ["src/story/*"],
-      "@onboarding/*": ["src/onboarding/*"],
-      "@missions/*": ["src/missions/*"],
-      "@taletrails/*": ["src/taletrails/*"],
-      "@treasurehunt/*": ["src/treasurehunt/*"],
-      "@closet/*": ["src/closet/*"],
-      "@vault/*": ["src/vault/*"],
-      "@beyond/*": ["src/beyond/*"],
-      "@companion/*": ["src/companion/*"],
-      "@assets/*": ["src/assets/*"],
-      "@navigation/*": ["src/navigation/*"],
-      "@services/*": ["src/services/*"],
-      "@state/*": ["src/state/*"],
-      "@apptypes": ["src/types/index"],
-      "@apptypes/*": ["src/types/*"]
+      "@theme": [
+        "src/theme/index"
+      ],
+      "@theme/*": [
+        "src/theme/*"
+      ],
+      "@components": [
+        "src/components/index"
+      ],
+      "@components/*": [
+        "src/components/*"
+      ],
+      "@transitions": [
+        "src/transitions/index"
+      ],
+      "@transitions/*": [
+        "src/transitions/*"
+      ],
+      "@worlds/*": [
+        "src/worlds/*"
+      ],
+      "@story": [
+        "src/story/index"
+      ],
+      "@story/*": [
+        "src/story/*"
+      ],
+      "@onboarding/*": [
+        "src/onboarding/*"
+      ],
+      "@missions/*": [
+        "src/missions/*"
+      ],
+      "@taletrails/*": [
+        "src/taletrails/*"
+      ],
+      "@treasurehunt/*": [
+        "src/treasurehunt/*"
+      ],
+      "@closet/*": [
+        "src/closet/*"
+      ],
+      "@vault/*": [
+        "src/vault/*"
+      ],
+      "@beyond/*": [
+        "src/beyond/*"
+      ],
+      "@companion/*": [
+        "src/companion/*"
+      ],
+      "@assets/*": [
+        "src/assets/*"
+      ],
+      "@navigation/*": [
+        "src/navigation/*"
+      ],
+      "@services/*": [
+        "src/services/*"
+      ],
+      "@state/*": [
+        "src/state/*"
+      ],
+      "@apptypes": [
+        "src/types/index"
+      ],
+      "@apptypes/*": [
+        "src/types/*"
+      ]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ]
 }

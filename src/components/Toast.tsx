@@ -14,13 +14,17 @@ export function Toast({ message, visible, onHide }: ToastProps) {
   const opacityValue = useSharedValue(0);
 
   useEffect(() => {
-    if (visible) {
-      opacityValue.value = withTiming(1, { duration: duration.fast });
-      opacityValue.value = withDelay(2200, withTiming(0, { duration: duration.fast }, (finished) => {
-        if (finished && onHide) onHide();
-      }));
-    }
-  }, [visible]);
+    if (!visible) return;
+
+    opacityValue.value = withTiming(1, { duration: duration.fast });
+
+    const timer = setTimeout(() => {
+      opacityValue.value = withTiming(0, { duration: duration.fast });
+      onHide?.();
+    }, 2200);
+
+    return () => clearTimeout(timer);
+  }, [visible, onHide]);
 
   const animatedStyle = useAnimatedStyle(() => ({ opacity: opacityValue.value }));
 
