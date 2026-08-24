@@ -3,10 +3,10 @@ import { View, StyleSheet } from "react-native";
 import { colors } from "@theme";
 import { WorldScene } from "@worlds/WorldScene";
 import { Toast } from "@components/Toast";
-import { StoryEpisodeDefinition, CompanionTraits } from "@apptypes";
+import { StoryEpisodeDefinition } from "@apptypes";
 import { useStoriesStore } from "@state/storiesStore";
 import { useProgressionStore } from "@state/progressionStore";
-import { useCompanionStore } from "@state/companionStore";
+import { triggerCompanionMoment } from "@companion/companionMoments";
 import { recordEpisodeCompletion } from "@services/supabase/stories";
 import { TaleTrailsHomeScreen } from "./screens/TaleTrailsHomeScreen";
 import { EpisodeDetailScreen } from "./screens/EpisodeDetailScreen";
@@ -41,9 +41,6 @@ export function TaleTrailsFlow({ onReturnToGrove }: TaleTrailsFlowProps) {
   const addCoins = useProgressionStore((s) => s.addCoins);
   const addAdventureTickets = useProgressionStore((s) => s.addAdventureTickets);
   const addCollectorTokens = useProgressionStore((s) => s.addCollectorTokens);
-  const pushNotification = useProgressionStore((s) => s.pushNotification);
-  const nudgeTrait = useCompanionStore((s) => s.nudgeTrait);
-  const setMood = useCompanionStore((s) => s.setMood);
 
   function grantReward(episode: StoryEpisodeDefinition, choiceId?: string) {
     const { reward } = episode;
@@ -51,12 +48,11 @@ export function TaleTrailsFlow({ onReturnToGrove }: TaleTrailsFlowProps) {
     addCoins(reward.coins);
     if (reward.adventureTickets) addAdventureTickets(reward.adventureTickets);
     if (reward.collectorTokens) addCollectorTokens(reward.collectorTokens);
-    (Object.entries(episode.traitLean) as [keyof CompanionTraits, number][]).forEach(([trait, amount]) => {
-      nudgeTrait(trait, amount);
-    });
     recordCompletion(episode.id, reward, choiceId);
-    setMood("celebrating");
-    pushNotification({ profile_id: "local-guest", kind: "adventure", message: `${episode.title} — trail complete!` });
+    triggerCompanionMoment("story", {
+      traitLean: episode.traitLean,
+      notification: { kind: "adventure", message: `${episode.title} — trail complete!` },
+    });
     // Best-effort Supabase sync — never blocks the local reward flow.
     recordEpisodeCompletion("local-guest", episode.id);
   }

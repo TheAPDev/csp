@@ -5,7 +5,22 @@ import { AssetImage } from "./AssetImage";
 import { AssetId } from "@assets/registry";
 import { shadows, radius } from "@theme";
 
-export type CompanionMood = "idle" | "happy" | "curious" | "sleepy" | "celebrating";
+export type CompanionMood =
+  | "idle"
+  | "happy"
+  | "curious"
+  | "sleepy"
+  | "celebrating"
+  // Batch 08 additions — the Companion's fuller emotional vocabulary.
+  // Each is wired to a real trigger site (see companionMoments.ts),
+  // not left as an unused enum value.
+  | "thinking"
+  | "encouraging"
+  | "questReaction"
+  | "storyReaction"
+  | "rewardReaction"
+  | "interaction"
+  | "reflective";
 
 const moodToAsset: Record<CompanionMood, AssetId> = {
   idle: "COMPANION_IDLE",
@@ -13,6 +28,13 @@ const moodToAsset: Record<CompanionMood, AssetId> = {
   curious: "COMPANION_CURIOUS",
   sleepy: "COMPANION_SLEEPY",
   celebrating: "COMPANION_CELEBRATING",
+  thinking: "COMPANION_THINKING",
+  encouraging: "COMPANION_ENCOURAGING",
+  questReaction: "COMPANION_QUEST_REACTION",
+  storyReaction: "COMPANION_STORY_REACTION",
+  rewardReaction: "COMPANION_REWARD_REACTION",
+  interaction: "COMPANION_INTERACTION",
+  reflective: "COMPANION_REFLECTIVE",
 };
 
 interface CompanionReactionProps {

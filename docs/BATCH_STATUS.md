@@ -730,3 +730,98 @@ the repository.
   reward history — to surface) should come first; flag this to the
   user rather than assuming, per the same open-question pattern
   Batch 05/06 left.
+
+## Batch 08 — Living Companion Progression System
+
+**Status: BUILT LOCALLY. Tested. Awaiting explicit "YES, PUSH" approval.**
+
+### What was built
+
+- `CompanionMood` extended from 5 to 12 states (7 new: `thinking`,
+  `encouraging`, `questReaction`, `storyReaction`, `rewardReaction`,
+  `interaction`, `reflective`), every one wired to a real trigger
+  site, not left unused.
+- `src/companion/companionMoments.ts` — `triggerCompanionMoment`, the
+  single centralized function that replaced three near-identical
+  inlined "nudge traits → set mood → push notification" blocks
+  previously duplicated across `MissionsFlow`, `TaleTrailsFlow`, and
+  `TreasureHuntFlow`. Also newly wired into `closetStore.purchase`,
+  `vaultStore.requestRedemption`, `VaultFlow`'s locked-reward view,
+  and `TaleTrailsFlow`'s Fireside beat — all points that previously
+  had zero or generic Companion reaction.
+- `src/companion/evolution.ts` — `leanFor(traits)`, a pure function
+  deriving a qualitative developmental lean (Ember/Tide/Whisper,
+  named after the three onboarding eggs) from live trait values only.
+  Never stored, never shown as a number — verified in isolation that
+  each egg's choice immediately resolves to its matching lean.
+- `components/GroveDecor.tsx` — a small, purely decorative Grove
+  ornament layer reflecting the current lean, gated by the *existing*
+  Batch 03 evolution stage (0/1/2 from `evolutionStageForLevel`) —
+  no new unlock timeline, reuses the one that already exists.
+- Grove's Companion-tap interaction now uses the dedicated
+  `interaction` mood via the centralized function, replacing a manual
+  happy/idle toggle.
+- 14 new placeholder-safe asset IDs (7 Companion moods, 6 Grove
+  decorations). New `@companion` path alias.
+- `/docs/WONDERKIN_CONTINUITY.md` updated: new §27 (Living Companion
+  Progression System) and §28 (explicit deferrals); §11 amended to
+  reflect the new centralized reward-granting shape.
+
+### Testing performed
+
+- `npm install` — succeeded, no errors.
+- `npx tsc --noEmit` — **0 errors** (iteratively fixed dangling
+  `useCompanionStore`/`nudgeTrait`/`setMood`/`pushNotification`
+  references left behind in `MissionsFlow.tsx`, `TaleTrailsFlow.tsx`,
+  and `TreasureHuntFlow.tsx` after centralizing their reward-granting
+  logic — caught immediately by the type checker each time).
+- `npx expo export --platform android` — **full Metro bundle
+  succeeded**: 1336 modules compiled into a working Hermes bytecode
+  bundle with no build errors (up from 1333 in Batch 07).
+- `npx expo-doctor` — 14/17 checks passed, same 3 sandbox-network-only
+  failures as every prior batch.
+- Verified `leanFor` in isolation with a standalone script before
+  trusting it on-device: confirmed each of the three eggs' baseline
+  trait nudges resolves to that egg's own matching lean immediately
+  after hatching.
+- Manually traced every new `triggerCompanionMoment` call site against
+  its expected mood mapping (quest→questReaction, story→storyReaction,
+  treasure→rewardReaction, purchase→encouraging,
+  vaultProgress→thinking, vaultRedeem→celebrating,
+  interaction→interaction, reflection→reflective) and confirmed the
+  two exhaustive `Record<CompanionMood, ...>` maps
+  (`moodToAsset`, `REACTION_LINES`) both cover all 12 states.
+- Build artifacts (`dist/`, `.expo/`) removed before commit.
+
+### Explicitly deferred (per master protocol + this batch's own scope)
+
+- Any trait/lean visible in UI as a number, chart, or label —
+  internal-only throughout, per the master protocol's explicit
+  "do not show personality scores, do not turn this into a badge
+  dashboard."
+- Changes to `evolutionStageForLevel`'s thresholds or a 4th/5th Grove
+  stage — the existing 3-stage system is reused exactly; only what
+  renders within a stage (the decoration layer) is new.
+- Real illustrated art for any of the 14 new asset IDs.
+- The Beyond — `triggerCompanionMoment` is ready for it (a new
+  `CompanionMomentKind` is a one-line addition) but no Beyond-specific
+  wiring exists yet.
+- Parent Space, Store, a second visual theme, real per-profile
+  Supabase identity — unchanged deferral list from every prior batch.
+
+### Push status
+
+**NOT pushed.** Per the approval gate, this batch is complete locally
+and waiting for the user to say "YES, PUSH" before any commit/push to
+the repository.
+
+### Next batch (Batch 09 of 10) should
+
+- Read this file and `WONDERKIN_CONTINUITY.md` first (§27/§28
+  especially).
+- Consider whether **The Beyond** (still the only unbuilt magical
+  World, and now has `triggerCompanionMoment` ready to plug into) or
+  **Parent Space** (has real redemption-request/reward data waiting to
+  be surfaced since Batch 07) should come first; flag this to the user
+  rather than assuming, per the same open-question pattern left by
+  Batch 05/06/07.

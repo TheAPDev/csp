@@ -25,6 +25,21 @@ export type AssetId =
   | "COMPANION_CURIOUS"
   | "COMPANION_SLEEPY"
   | "COMPANION_CELEBRATING"
+  // Batch 08 — fuller Companion emotional vocabulary
+  | "COMPANION_THINKING"
+  | "COMPANION_ENCOURAGING"
+  | "COMPANION_QUEST_REACTION"
+  | "COMPANION_STORY_REACTION"
+  | "COMPANION_REWARD_REACTION"
+  | "COMPANION_INTERACTION"
+  | "COMPANION_REFLECTIVE"
+  // Batch 08 — Grove decoration layer, unlocked by evolution stage/path
+  | "GROVE_DECOR_EMBER_1"
+  | "GROVE_DECOR_EMBER_2"
+  | "GROVE_DECOR_TIDE_1"
+  | "GROVE_DECOR_TIDE_2"
+  | "GROVE_DECOR_WHISPER_1"
+  | "GROVE_DECOR_WHISPER_2"
   // Worlds
   | "GROVE_BACKGROUND"
   | "MISSIONS_BACKGROUND"
@@ -131,6 +146,19 @@ export const assetRegistry: Record<AssetId, AssetEntry> = {
   COMPANION_CURIOUS: { kind: "image", source: null },
   COMPANION_SLEEPY: { kind: "image", source: null },
   COMPANION_CELEBRATING: { kind: "image", source: null },
+  COMPANION_THINKING: { kind: "image", source: null },
+  COMPANION_ENCOURAGING: { kind: "image", source: null },
+  COMPANION_QUEST_REACTION: { kind: "image", source: null },
+  COMPANION_STORY_REACTION: { kind: "image", source: null },
+  COMPANION_REWARD_REACTION: { kind: "image", source: null },
+  COMPANION_INTERACTION: { kind: "image", source: null },
+  COMPANION_REFLECTIVE: { kind: "image", source: null },
+  GROVE_DECOR_EMBER_1: { kind: "image", source: null },
+  GROVE_DECOR_EMBER_2: { kind: "image", source: null },
+  GROVE_DECOR_TIDE_1: { kind: "image", source: null },
+  GROVE_DECOR_TIDE_2: { kind: "image", source: null },
+  GROVE_DECOR_WHISPER_1: { kind: "image", source: null },
+  GROVE_DECOR_WHISPER_2: { kind: "image", source: null },
 
   GROVE_BACKGROUND: { kind: "image", source: null },
   MISSIONS_BACKGROUND: { kind: "image", source: null },

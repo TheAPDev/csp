@@ -9,6 +9,7 @@ import {
   Dialogue,
   StatusHub,
   GroveAmbient,
+  GroveDecor,
   WorldGateway,
   GatewayDestination,
   TodaysAdventureCard,
@@ -16,6 +17,8 @@ import {
 import { useCompanionStore } from "@state/companionStore";
 import { useProgressionStore } from "@state/progressionStore";
 import { useGroveStore, evolutionStageForLevel, groveBackgroundForStage } from "@state/groveStore";
+import { leanFor } from "@companion/evolution";
+import { triggerCompanionMoment } from "@companion/companionMoments";
 
 interface GroveWorldProps {
   /** Supplied by RootNavigator so tapping a gateway can drive the World-switch transition. */
@@ -37,6 +40,13 @@ const REACTION_LINES: Record<CompanionMood, string> = {
   curious: "What should we explore today?",
   sleepy: "Mmm... just resting my eyes.",
   celebrating: "We did it together!",
+  thinking: "Hmm... I wonder what today will bring.",
+  encouraging: "You've got this. I believe in you.",
+  questReaction: "That quest is calling your name.",
+  storyReaction: "I love how that story turned out.",
+  rewardReaction: "Ooh, what did you find?",
+  interaction: "You found me!",
+  reflective: "I've been thinking about our adventures together.",
 };
 
 /**
@@ -51,8 +61,7 @@ export default function GroveWorld({ onNavigateToWorld }: GroveWorldProps) {
 
   const companionName = useCompanionStore((s) => s.name);
   const mood = useCompanionStore((s) => s.mood);
-  const setMood = useCompanionStore((s) => s.setMood);
-  const nudgeTrait = useCompanionStore((s) => s.nudgeTrait);
+  const traits = useCompanionStore((s) => s.traits);
 
   const xp = useProgressionStore((s) => s.xp);
   const level = useProgressionStore((s) => s.level);
@@ -75,15 +84,18 @@ export default function GroveWorld({ onNavigateToWorld }: GroveWorldProps) {
   const evolutionStage = useMemo(() => evolutionStageForLevel(level), [level]);
   const backgroundAssetId = useMemo(() => groveBackgroundForStage(evolutionStage), [evolutionStage]);
 
+  // The Companion's current developmental lean — always derived live
+  // from traits (see @companion/evolution), never stored. Drives the
+  // Grove's decoration layer only; never rendered as a label/score.
+  const lean = useMemo(() => leanFor(traits), [traits]);
+
   const displayName = companionName || "your Companion";
 
   function handleCompanionTap() {
-    // A small, alive interaction: cycle an expressive mood, nudge the
-    // bond trait quietly (never shown as a number), and show a short
-    // line — all without leaving the Grove.
-    const nextMood: CompanionMood = mood === "happy" ? "idle" : "happy";
-    setMood(nextMood);
-    nudgeTrait("bond", 0.01);
+    // A small, alive interaction: the dedicated "interaction" mood
+    // (Batch 08), a quiet bond nudge (never shown as a number), and a
+    // short line — all without leaving the Grove.
+    triggerCompanionMoment("interaction", { traitLean: { bond: 0.01 } });
     setShowReaction(true);
     setTimeout(() => setShowReaction(false), 2600);
   }
@@ -95,6 +107,7 @@ export default function GroveWorld({ onNavigateToWorld }: GroveWorldProps) {
   return (
     <WorldScene backgroundAssetId={backgroundAssetId}>
       <GroveAmbient intensity={evolutionStage === 2 ? 10 : evolutionStage === 1 ? 8 : 6} />
+      <GroveDecor lean={lean} stage={evolutionStage} />
 
       <SafeAreaView style={styles.safeArea} pointerEvents="box-none">
         <View style={styles.topRow} pointerEvents="box-none">

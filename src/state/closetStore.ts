@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CosmeticCategory, CosmeticItemDefinition } from "@apptypes";
 import { useProgressionStore } from "@state/progressionStore";
+import { triggerCompanionMoment } from "@companion/companionMoments";
 import { findClosetItem } from "@closet/content/catalog";
 import { recordCosmeticPurchase, saveEquippedSlots } from "@services/supabase/closet";
 
@@ -50,6 +51,9 @@ export const useClosetStore = create<ClosetStoreState>()(
         set({ ownedItemIds: [...get().ownedItemIds, item.id] });
         // Best-effort Supabase sync — never blocks the local purchase.
         recordCosmeticPurchase("local-guest", item.id);
+        triggerCompanionMoment("purchase", {
+          notification: { kind: "reward", message: `New look unlocked: ${item.name}!` },
+        });
         return "purchased";
       },
 

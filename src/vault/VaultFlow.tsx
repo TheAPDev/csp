@@ -4,6 +4,7 @@ import { worldRegistry } from "@worlds/WorldRegistry";
 import { VaultRewardDefinition } from "@apptypes";
 import { useProgressionStore } from "@state/progressionStore";
 import { useVaultStore } from "@state/vaultStore";
+import { triggerCompanionMoment } from "@companion/companionMoments";
 import { VaultHomeScreen } from "./screens/VaultHomeScreen";
 import { VaultRewardDetailScreen } from "./screens/VaultRewardDetailScreen";
 import { ParentHandoffScreen } from "./screens/ParentHandoffScreen";
@@ -30,6 +31,15 @@ export function VaultFlow({ onReturnToGrove }: VaultFlowProps) {
   const hasActiveRequest = useVaultStore((s) => s.hasActiveRequest);
   const requestRedemption = useVaultStore((s) => s.requestRedemption);
 
+  function handleSelectReward(reward: VaultRewardDefinition) {
+    const { eligible } = progressFor(reward);
+    // A quiet "still dreaming about it" beat for a reward that's not
+    // eligible yet — never a nag, never a countdown, just the
+    // Companion musing alongside the child while they look.
+    if (!eligible) triggerCompanionMoment("vaultProgress");
+    setStep({ name: "detail", reward });
+  }
+
   function handleRedeem(reward: VaultRewardDefinition) {
     const outcome = requestRedemption(reward);
     if (outcome === "requested") {
@@ -47,7 +57,7 @@ export function VaultFlow({ onReturnToGrove }: VaultFlowProps) {
           collectorTokens={collectorTokens}
           progressFor={progressFor}
           hasActiveRequest={hasActiveRequest}
-          onSelectReward={(reward) => setStep({ name: "detail", reward })}
+          onSelectReward={(reward) => handleSelectReward(reward)}
           onReturnToGrove={onReturnToGrove}
         />
       )}

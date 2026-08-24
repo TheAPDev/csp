@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { colors } from "@theme";
 import { WorldScene } from "@worlds/WorldScene";
-import { TreasureDefinition, CompanionTraits } from "@apptypes";
+import { TreasureDefinition } from "@apptypes";
 import { treasuresForBiome } from "./content/treasureDefinitions";
 import { getCoarseBiome, TreasureBiome } from "@services/location/coarseLocation";
 import { recordTreasureCollection } from "@services/supabase/treasureHunt";
 import { useTreasureHuntStore } from "@state/treasureHuntStore";
 import { useProgressionStore } from "@state/progressionStore";
-import { useCompanionStore } from "@state/companionStore";
+import { triggerCompanionMoment } from "@companion/companionMoments";
 import { HuntEntryScreen } from "./screens/HuntEntryScreen";
 import { ExplorationScreen } from "./screens/ExplorationScreen";
 import { CollectionScreen } from "./screens/CollectionScreen";
@@ -41,9 +41,6 @@ export function TreasureHuntFlow({ onReturnToGrove }: TreasureHuntFlowProps) {
   const addCoins = useProgressionStore((s) => s.addCoins);
   const addAdventureTickets = useProgressionStore((s) => s.addAdventureTickets);
   const addCollectorTokens = useProgressionStore((s) => s.addCollectorTokens);
-  const pushNotification = useProgressionStore((s) => s.pushNotification);
-  const nudgeTrait = useCompanionStore((s) => s.nudgeTrait);
-  const setMood = useCompanionStore((s) => s.setMood);
 
   useEffect(() => {
     // Coarse biome only, resolved once per visit and never surfaced —
@@ -59,12 +56,11 @@ export function TreasureHuntFlow({ onReturnToGrove }: TreasureHuntFlowProps) {
     addCoins(reward.coins);
     if (reward.adventureTickets) addAdventureTickets(reward.adventureTickets);
     if (reward.collectorTokens) addCollectorTokens(reward.collectorTokens);
-    (Object.entries(treasure.traitLean) as [keyof CompanionTraits, number][]).forEach(([trait, amount]) => {
-      nudgeTrait(trait, amount);
-    });
     recordCollection(treasure.id, reward);
-    setMood("celebrating");
-    pushNotification({ profile_id: "local-guest", kind: "reward", message: `Found ${treasure.name}!` });
+    triggerCompanionMoment("treasure", {
+      traitLean: treasure.traitLean,
+      notification: { kind: "reward", message: `Found ${treasure.name}!` },
+    });
     // Best-effort Supabase sync — never blocks the local reward flow.
     recordTreasureCollection("local-guest", treasure.id, reward);
   }

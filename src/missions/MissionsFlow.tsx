@@ -7,7 +7,7 @@ import { VerificationResult } from "@services/verification/MissionVerificationSe
 import { logMissionSubmission, recordMissionCompletion } from "@services/supabase/missions";
 import { useMissionsStore } from "@state/missionsStore";
 import { useProgressionStore } from "@state/progressionStore";
-import { useCompanionStore } from "@state/companionStore";
+import { triggerCompanionMoment } from "@companion/companionMoments";
 import { MissionsHomeScreen } from "./screens/MissionsHomeScreen";
 import { MissionDetailScreen } from "./screens/MissionDetailScreen";
 import { CameraCaptureScreen } from "./screens/CameraCaptureScreen";
@@ -15,7 +15,6 @@ import { PhotoPreviewScreen } from "./screens/PhotoPreviewScreen";
 import { VerificationScreen } from "./screens/VerificationScreen";
 import { RewardScreen } from "./screens/RewardScreen";
 import { CompletionHistorySheet } from "./screens/CompletionHistorySheet";
-import { CompanionTraits } from "@apptypes";
 
 type Step =
   | { name: "home" }
@@ -46,9 +45,6 @@ export function MissionsFlow({ onReturnToGrove }: MissionsFlowProps) {
   const addCoins = useProgressionStore((s) => s.addCoins);
   const addAdventureTickets = useProgressionStore((s) => s.addAdventureTickets);
   const addCollectorTokens = useProgressionStore((s) => s.addCollectorTokens);
-  const pushNotification = useProgressionStore((s) => s.pushNotification);
-  const nudgeTrait = useCompanionStore((s) => s.nudgeTrait);
-  const setMood = useCompanionStore((s) => s.setMood);
 
   function grantReward(mission: MissionDefinition) {
     const { reward } = mission;
@@ -56,12 +52,11 @@ export function MissionsFlow({ onReturnToGrove }: MissionsFlowProps) {
     addCoins(reward.coins);
     if (reward.adventureTickets) addAdventureTickets(reward.adventureTickets);
     if (reward.collectorTokens) addCollectorTokens(reward.collectorTokens);
-    (Object.entries(mission.traitLean) as [keyof CompanionTraits, number][]).forEach(([trait, amount]) => {
-      nudgeTrait(trait, amount);
-    });
     recordCompletion(mission.id, reward);
-    setMood("celebrating");
-    pushNotification({ profile_id: "local-guest", kind: "reward", message: `${mission.title} complete!` });
+    triggerCompanionMoment("quest", {
+      traitLean: mission.traitLean,
+      notification: { kind: "reward", message: `${mission.title} complete!` },
+    });
     // Best-effort Supabase sync — never blocks the local reward flow.
     recordMissionCompletion("local-guest", mission.id, reward);
   }

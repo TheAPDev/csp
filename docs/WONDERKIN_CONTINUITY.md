@@ -252,18 +252,30 @@ Store) will extend in later batches, not a finished nav system.
   `CameraCaptureScreen` and Treasure Hunt's `ExplorationScreen` both
   use it. A third camera-using World must reuse it too, not fork a
   new permission flow (Batch 06).
-- Treasure/Mission reward-granting shape stays aligned: XP/coins/
-  currencies via `progressionStore`, trait nudges via
-  `companionStore.nudgeTrait`, a `pushNotification` call, then a
-  best-effort Supabase log — see `TreasureHuntFlow.grantReward` /
-  `MissionsFlow.grantReward`. A future reward-granting World should
-  follow the same shape rather than inventing a parallel one
-  (Batch 06).
+- Treasure/Mission/Story reward-granting shape stays aligned: XP/
+  coins/currencies via `progressionStore`, then a single
+  `triggerCompanionMoment(kind, { traitLean, notification })` call
+  (`@companion/companionMoments.ts`) — NOT a direct
+  `nudgeTrait`/`setMood`/`pushNotification` sequence inlined in the
+  flow. This was refactored in Batch 08 from three near-identical
+  inlined blocks into one centralized function specifically so a
+  future reward-granting World adds one call, not a fourth copy of
+  the same logic (Batch 06 established the shape; Batch 08
+  centralized it — see §27).
 - Coarse location: `services/location/coarseLocation.ts` never
   returns or stores the raw coordinate past the function's own scope
   — it returns only a coarse biome label. Do not add a caller that
   reads `position.coords` directly instead of going through this
   function (Batch 06).
+- `triggerCompanionMoment` (`@companion/companionMoments.ts`) is the
+  ONLY place that decides which `CompanionMood` a moment uses. Adding
+  a new kind of moment means adding one `CompanionMomentKind` + one
+  `momentMood` entry — never call `useCompanionStore.getState().setMood`
+  directly from a World flow or store action (Batch 08).
+- `leanFor` (`@companion/evolution.ts`) is always derived live from
+  current trait values, never stored, never rendered as a label,
+  chart, or score anywhere in the UI. Do not persist a "lean"/
+  "disposition" field or expose it in any child-facing copy (Batch 08).
 
 If a later batch believes one of these must change, **stop and ask
 the user** rather than redesigning silently, per the master protocol's
@@ -760,3 +772,125 @@ future batches must not break:
   to the existing themed placeholder via `AssetImage`.
 - The Beyond, a second visual theme, or real-money payment rails of
   any kind.
+
+## 27. Living Companion Progression System — Batch 08
+
+The Companion gains a fuller emotional vocabulary and a real
+(internal-only) developmental identity, and every World's reward path
+now runs through one shared mechanism instead of five copies of the
+same logic.
+
+- **`CompanionMood` grew from 5 to 12 states**
+  (`components/CompanionReaction.tsx`), additively — `idle`, `happy`,
+  `curious`, `sleepy`, `celebrating` are unchanged; new: `thinking`,
+  `encouraging`, `questReaction`, `storyReaction`, `rewardReaction`,
+  `interaction`, `reflective`. Every new state is wired to a real
+  trigger site (see below), not left as a dead enum value. The two
+  places that exhaustively switch on `CompanionMood`
+  (`moodToAsset` in `CompanionReaction.tsx`, `REACTION_LINES` in
+  `Grove.tsx`) were both updated — any third exhaustive
+  `Record<CompanionMood, ...>` added later must cover all 12 states
+  or TypeScript will catch the gap at compile time.
+- **`src/companion/companionMoments.ts`** — `triggerCompanionMoment
+  (kind, { traitLean?, notification? })` is now the single place that
+  decides which mood a given kind of moment uses AND performs the
+  trait-nudge + notification side effects. Before this batch,
+  `MissionsFlow.grantReward`, `TaleTrailsFlow.grantReward`, and
+  `TreasureHuntFlow.grantReward` each independently inlined an
+  identical "loop `traitLean` entries → `nudgeTrait`,
+  `setMood('celebrating')`, `pushNotification`" block — that
+  triplication is now this one function, called with a different
+  `CompanionMomentKind` (`"quest"` / `"story"` / `"treasure"`) so each
+  World's completion still feels distinct (`questReaction` /
+  `storyReaction` / `rewardReaction` respectively) without three
+  separate implementations. This is what the master protocol's
+  "connect missions/stories/treasure/Beyond/XP/level/rewards/
+  Companion state — use centralized state, do not create duplicate
+  progression systems" means concretely in this codebase.
+- **Closet and Vault gained Companion awareness they never had**:
+  `closetStore.purchase` now fires `triggerCompanionMoment("purchase")`
+  (mood `encouraging`) at its existing single mutation point;
+  `vaultStore.requestRedemption` fires `triggerCompanionMoment
+  ("vaultRedeem")` (mood `celebrating`); `VaultFlow.handleSelectReward`
+  fires `triggerCompanionMoment("vaultProgress")` (mood `thinking`)
+  when the child opens a reward that isn't eligible yet — a quiet
+  "still dreaming about it" beat, never a nag or countdown. All three
+  are additive calls at points that already existed; no purchase/
+  redemption logic itself changed.
+- **`TaleTrailsFlow`'s Fireside now uses `reflective`, not
+  `celebrating`**: `FiresideScreen` previously hardcoded
+  `mood="celebrating"` as a static prop, ignoring the live store mood
+  entirely. It now reads the live `companionStore.mood` and fires
+  `triggerCompanionMoment("reflection")` on mount, so the sequence
+  is: episode completes → brief `storyReaction` (from `grantReward`) →
+  settles to `reflective` once Fireside actually renders → the
+  following `StoryRewardScreen` still hardcodes `celebrating`
+  independently. This keeps Fireside's "reflection, not a report
+  card" framing (§21) visually distinct from the reward screen's
+  actual celebration.
+- **`src/companion/evolution.ts`** — `leanFor(traits):
+  CompanionLean` (`"ember" | "tide" | "whisper"`, named after the
+  three onboarding eggs — see `onboarding/content/eggs.ts`) is a pure
+  function of live trait values: `emberScore = courage + voice*0.5`,
+  `tideScore = heart + bond*0.5`, `whisperScore = curiosity +
+  voice*0.5`, highest wins with a fixed tide→ember→whisper tie-break.
+  Verified in isolation that choosing each egg (which nudges traits at
+  hatching) immediately resolves to that egg's own matching lean, and
+  that the lean can shift later as Missions/Tale Trails/Treasure Hunt
+  keep nudging traits — this is the concrete mechanism behind "the
+  initial egg influences starting direction, but final development
+  also responds to the child's journey." Like the traits it reads,
+  the lean is NEVER stored, NEVER shown as a number/label/chart
+  anywhere in the UI — see §11.
+- **Grove decoration layer**: `components/GroveDecor.tsx` renders 1-2
+  small ornament images (`groveDecorForLean` in `evolution.ts` picks
+  the pair for the current lean) gated by the *existing*
+  `evolutionStageForLevel` stage (0 = none, 1 = one ornament, 2 = both)
+  — reuses Batch 03's stage-gating exactly rather than adding a
+  second unlock timeline. Purely decorative
+  (`pointerEvents="none"`), mirrors `GroveAmbient`'s "no interaction
+  required" pattern, never labels which lean it reflects. This is the
+  "subtle Grove evolution... this is MY place" requirement: the same
+  Grove background-stage system from Batch 03 now also quietly
+  reflects the child's own accumulated choices, not just their XP
+  level.
+- **Grove's Companion tap now uses `interaction`, not a happy/idle
+  toggle**: `handleCompanionTap` previously flipped `mood` between
+  `"happy"` and `"idle"` and called `nudgeTrait("bond", 0.01)`
+  directly; it now calls `triggerCompanionMoment("interaction", {
+  traitLean: { bond: 0.01 } })` — same trigger (direct tap), same
+  trait nudge amount, now using the dedicated `interaction` mood and
+  going through the centralized function like every other Companion
+  reaction in the app.
+- 14 new placeholder-safe `AssetId`s: 7 Companion mood portraits
+  (`COMPANION_THINKING` / `_ENCOURAGING` / `_QUEST_REACTION` /
+  `_STORY_REACTION` / `_REWARD_REACTION` / `_INTERACTION` /
+  `_REFLECTIVE`) + 6 Grove decoration ornaments (`GROVE_DECOR_EMBER_1/2`,
+  `GROVE_DECOR_TIDE_1/2`, `GROVE_DECOR_WHISPER_1/2`). New `@companion`
+  path alias.
+
+## 28. What Batch 08 Explicitly Did NOT Implement
+
+- Any UI that names, charts, scores, or labels a trait or lean —
+  every mechanism in this batch is read internally only, per the
+  master protocol's explicit "do not show personality scores, do not
+  turn this into a badge dashboard."
+- A fourth Grove evolution stage or any change to
+  `evolutionStageForLevel`'s thresholds/derivation — stage gating is
+  reused exactly as Batch 03 built it; only what renders *within* an
+  existing stage (the decoration layer) is new.
+- Real illustrated art for any of the 14 new `AssetId`s — all resolve
+  to the existing themed placeholder via `AssetImage`.
+- The Beyond (still unbuilt) — `triggerCompanionMoment` is ready for
+  it to plug into (a `"beyond"` `CompanionMomentKind` is a one-line
+  addition when that World is built), but no Beyond-specific wiring
+  exists yet.
+- Parent Space, Store, a second visual theme, real per-profile
+  Supabase identity (still the `"local-guest"` placeholder) — all
+  unchanged from every prior batch's deferral list.
+- A literal "future evolution stage" beyond the existing 0/1/2 — the
+  master protocol's "Egg → hatching → early Companion → later
+  development → future evolution stages" progression is satisfied by
+  onboarding's hatching (stage-independent) plus the existing 3 Grove
+  stages; a 4th/5th stage is a natural follow-up, not built here to
+  avoid inventing thresholds with no gameplay yet to justify them.

@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RedemptionRequest, RedemptionStatus, VaultRewardDefinition } from "@apptypes";
 import { useProgressionStore } from "@state/progressionStore";
+import { triggerCompanionMoment } from "@companion/companionMoments";
 import { recordRedemptionRequest } from "@services/supabase/vault";
 
 export type RedemptionOutcome = "requested" | "already_requested" | "insufficient_currency";
@@ -52,6 +53,9 @@ export const useVaultStore = create<VaultStoreState>()(
         set({ requests: [request, ...get().requests] });
         // Best-effort Supabase sync — never blocks the local request.
         recordRedemptionRequest("local-guest", reward.id);
+        triggerCompanionMoment("vaultRedeem", {
+          notification: { kind: "reward", message: `${reward.name} requested — a grown-up will help finish this!` },
+        });
         return "requested";
       },
     }),
