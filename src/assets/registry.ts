@@ -52,6 +52,7 @@ export type AssetId =
   | "EGG_THREE"
   // First-time onboarding (Batch 02)
   | "ONBOARDING_WELCOME_BACKGROUND"
+  | "WONDERKIN_LOGO"
   | "ONBOARDING_STORY_BACKGROUND"
   | "ONBOARDING_STORY_VIDEO"
   // Grove environmental evolution stages (Batch 03) — background varies
@@ -178,6 +179,8 @@ export const assetRegistry: Record<AssetId, AssetEntry> = {
   EGG_THREE: { kind: "image", source: null },
 
   ONBOARDING_WELCOME_BACKGROUND: { kind: "image", source: null },
+  // App logo used across onboarding screens and marketing placements.
+  WONDERKIN_LOGO: { kind: "image", source: require("./images/wonderkin-logo.png") },
   ONBOARDING_STORY_BACKGROUND: { kind: "image", source: null },
   // Local onboarding loop video. Re-encoded to a simpler MP4 profile for
   // better compatibility with Expo AV while preserving the intended loop.

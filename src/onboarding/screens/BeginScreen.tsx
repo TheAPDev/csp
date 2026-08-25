@@ -1,7 +1,7 @@
 ﻿import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { CompanionReaction } from "@components/CompanionReaction";
+import { AssetImage } from "@components/AssetImage";
 import { PrimaryButton } from "@components/PrimaryButton";
 import { colors, typography, spacing } from "@theme";
 import { useOnboardingStore } from "@state/onboardingStore";
@@ -15,7 +15,7 @@ export function BeginScreen() {
 
   return (
     <View style={styles.root}>
-      <CompanionReaction mood="curious" size={120} />
+      <AssetImage id="WONDERKIN_LOGO" style={{ width: 120, height: 120, borderRadius: 60 }} />
       <Text style={styles.title}>Welcome to WonderKin</Text>
       <Text style={styles.subtitle}>A little spark has been waiting for someone just like you.</Text>
       <PrimaryButton label="Let's Begin" onPress={advance} style={styles.cta} />

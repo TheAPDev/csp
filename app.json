@@ -6,11 +6,12 @@
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
-    "icon": "./src/assets/images/icon-placeholder.png",
+    "icon": "./src/assets/images/wonderkin-logo.png",
     "splash": {
       "backgroundColor": "#0B1026"
     },
     "assetBundlePatterns": ["**/*"],
+    "updates": { "enabled": false },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.wonderkin.app"
