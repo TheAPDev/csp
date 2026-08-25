@@ -1,9 +1,7 @@
 ﻿import React from "react";
 import { View, Text, Pressable, StyleSheet, ImageStyle } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { WebView } from "react-native-webview";
 import * as Haptics from "expo-haptics";
-import { AssetImage } from "@components/AssetImage";
 import { colors, typography, spacing, radius, shadows } from "@theme";
 import { useOnboardingStore } from "@state/onboardingStore";
 import { eggDefinitions, EggDefinition } from "../content/eggs";
